@@ -9,14 +9,14 @@ This repository contains:
 - Introduction to diversity analysis using 16S rRNA gene sequencing
 
 2. Tutorial  for analysis of Miseq data using *Mothur*:
-- We will use a modified version of a tutorial created by *Mothur* developers [(accesible here)](<https://github.com/carden24/2018_Taller_Genomica_ambiental/blob/master/Miseq_SOP_tutorial.md>)
+- We will use a modified version of a tutorial created by *Mothur* developers [(accesible here).](<https://github.com/carden24/2018_Taller_Genomica_ambiental/blob/master/Miseq_SOP_tutorial.md>)
 The main difference is that we will not do a phylotype analysis and use fewer samples to make the tutorial faster.  
-The standard operational protocol (SOP) for *Mothur* using Miseq data can be found [here]<http://www.mothur.org/wiki/MiSeq_SOP>).
-- We require to have *Mothur* installed. The installer can be found [here](<http://www.mothur.org/wiki/Download_mothur>)_. Seleccionado el adecuado para tu sistemas operativo.
-- The reference alignment for the 16S rRNA gene created by *Silva* can be found [here](<http://www.mothur.org/w/images/9/98/Silva.bacteria.zip>)
-- The version .9 of the training set created by the RDP for *Mothur* can be found [here](<http://www.mothur.org/w/images/5/59/Trainset9_032012.pds.zip>).
-- The files required can be found [here](https://github.com/carden24/2018_Taller_Genomica_ambiental/tree/master/MiSeq_SOP_files).
-- For 454 type data, *Mothur* also has a  recommended protocol [here](<http://www.mothur.org/wiki/454_SOP>).
+The standard operational protocol (SOP) for *Mothur* using Miseq data can be found [here.](<http://www.mothur.org/wiki/MiSeq_SOP>)
+- We require to have *Mothur* installed. The installer can be found [here](<http://www.mothur.org/wiki/Download_mothur>) (be sure to select the one for your operational system.
+- The reference alignment for the 16S rRNA gene created by *Silva* can be found [here.](<http://www.mothur.org/w/images/9/98/Silva.bacteria.zip>)
+- The version .9 of the training set created by the RDP for *Mothur* can be found [here.](<http://www.mothur.org/w/images/5/59/Trainset9_032012.pds.zip>)
+- The files required can be found [here.](https://github.com/carden24/2018_Taller_Genomica_ambiental/tree/master/MiSeq_SOP_files)
+- For 454 type data, *Mothur* also has a  recommended protocol [here.](<http://www.mothur.org/wiki/454_SOP>)
 
 3. Tutorial for manipulation of *Mothur* files using *Phyloseq*
 - We will use R and the *Phyloseq* package. The tutorial can be found [here](<https://github.com/carden24/2018_Taller_Genomica_ambiental/blob/master/Miseq_SOP_tutorial.md>)
