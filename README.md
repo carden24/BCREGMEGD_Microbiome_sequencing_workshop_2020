@@ -9,7 +9,7 @@ This repository contains:
 - Introduction to diversity analysis using 16S rRNA gene sequencing
 
 2. Tutorial  for analysis of Miseq data using *Mothur*:
-- We will use a modified version of a tutorial created by *Mothur* developers [(accesible here).](<https://github.com/carden24/BCREGMEGD_Microbiome_sequencing_workshop_2020/blob/master/Miseq_SOP_tutorial.md>)
+- We will use a modified version of a tutorial created by *Mothur* developers [(accesible here).](<https://github.com/carden24/BCREGMEGD_Microbiome_sequencing_workshop_2020/blob/master/Tutorial_mothur_Miseq_SOP.md>)
 The main difference is that we will not do a phylotype analysis and use fewer samples to make the tutorial faster.  
 The standard operational protocol (SOP) for *Mothur* using Miseq data can be found [here.](<http://www.mothur.org/wiki/MiSeq_SOP>)
 - We require to have *Mothur* installed. The installer can be found [here](<http://www.mothur.org/wiki/Download_mothur>) (be sure to select the one for your operational system.
@@ -19,8 +19,7 @@ The standard operational protocol (SOP) for *Mothur* using Miseq data can be fou
 - For 454 type data, *Mothur* also has a  recommended protocol [here.](<http://www.mothur.org/wiki/454_SOP>)
 
 3. Tutorial for manipulation of *Mothur* files using *Phyloseq*
-- We will use R and the *Phyloseq* package. The tutorial can be found [here](<https://github.com/carden24/BCREGMEGD_Microbiome_sequencing_workshop_2020/blob/master/Tutorial_phyloseq.md>)
-The microbiome data comes from the previous tutorial.
+- We will use R and the *Phyloseq* package. The tutorial can be found [here](<https://github.com/carden24/BCREGMEGD_Microbiome_sequencing_workshop_2020/blob/master/Tutorial_phyloseq.md>). The microbiome data comes from the previous tutorial.
 - The tutorial is based partialy on a *Phyloseq*  tutorial created by Michelle Berry found [here](http://deneflab.github.io/MicrobeMiseq/demos/mothur_2_phyloseq.html).
 
 4. Other files (in the folder *Resources*):  
