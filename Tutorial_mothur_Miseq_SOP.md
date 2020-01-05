@@ -125,7 +125,7 @@ The primers used to amplify the V4 region, 515F and 806R, create a product of ro
 make.contigs(file=stability.files, processors=2)
 ```
 
-The commenda created some files that are later used:
+The command created some files that are later used:
   
 - *stability.trim.contigs.fasta* : The newly joined sequence
 - *stability.contigs.groups* : The sample or group that each sequence belongs
@@ -163,6 +163,7 @@ screen.seqs(fasta=current, group=current, summary=current, maxambig=0, maxlength
 
 
 >summary.seqs()
+
                 Start   End     NBases  Ambigs  Polymer NumSeqs
 Minimum:        1       250     250     0       3       1
 2.5%-tile:      1       252     252     0       3       1313
@@ -214,6 +215,7 @@ After alignment, we can run again *summary.seqs()* to create statistics for the 
 ````
 summary.seqs(count=current)
 
+
                 Start   End     NBases  Ambigs  Polymer NumSeqs
 Minimum:        1250    11546   250     0       3       1
 2.5%-tile:      1968    11550   252     0       3       1313
@@ -223,7 +225,8 @@ Median:         1968    11550   252     0       4       26253
 97.5%-tile:     1968    11550   253     0       6       51192
 Maximum:        1982    11553   259     0       11      52504
 Mean:   1967    11549   252     0       4
-# of Seqs:      52504
+# of unique seqs:       7792
+total # of seqs:        52504
 ````
 
 These results show that the majority of the sequences start at position 1968 and end at position 11550. 
@@ -236,18 +239,18 @@ screen.seqs(fasta=current, count=current, start=1968, end=11550, maxhomop=8)
 
 >summary.seqs(count=current)
 
+
                 Start   End     NBases  Ambigs  Polymer NumSeqs
 Minimum:        1965    11550   250     0       3       1
-2.5%-tile:      1968    11550   252     0       3       3217
-25%-tile:       1968    11550   252     0       4       32164
-Median:         1968    11550   252     0       4       64328
-75%-tile:       1968    11550   253     0       5       96492
-97.5%-tile:     1968    11550   253     0       6       125439
-Maximum:        1968    13400   270     0       8       128655
-Mean:   1968    11550   252.463 0       4.36666
-# of unique seqs:       16298
-total # of seqs:        128655
-
+2.5%-tile:      1968    11550   252     0       3       1311
+25%-tile:       1968    11550   252     0       4       13106
+Median:         1968    11550   252     0       4       26211
+75%-tile:       1968    11550   253     0       5       39316
+97.5%-tile:     1968    11550   253     0       6       51110
+Maximum:        1968    11553   256     0       8       52420
+Mean:   1967    11550   252     0       4
+# of unique seqs:       7735
+total # of seqs:        52420
 ```
 
 Now we can edit the alignment to remove position that contain only gaps because they have no information. The *screen.seqs* command also need to know which character is used in the aligment to indicate that there is no information (trump character). In our case, Silva uses ".".
@@ -267,17 +270,18 @@ Finaly, we run *summary.seqs()* and see that the alignment has fewer position wh
 ````
 summary.seqs(count=current)
 
+
                 Start   End     NBases  Ambigs  Polymer NumSeqs
-Minimum:        1       376     249     0       3       1
-2.5%-tile:      1       376     252     0       3       3217
-25%-tile:       1       376     252     0       4       32164
-Median:         1       376     252     0       4       64328
-75%-tile:       1       376     253     0       5       96492
-97.5%-tile:     1       376     253     0       6       125439
-Maximum:        1       376     256     0       8       128655
-Mean:   1       376     252.462 0       4.36666
-# of unique seqs:       16295
-total # of seqs:        128655
+Minimum:        1       359     249     0       3       1
+2.5%-tile:      1       359     252     0       3       1311
+25%-tile:       1       359     252     0       4       13106
+Median:         1       359     252     0       4       26211
+75%-tile:       1       359     253     0       5       39316
+97.5%-tile:     1       359     253     0       6       51110
+Maximum:        1       359     256     0       8       52420
+Mean:   1       359     252     0       4
+# of unique seqs:       7733
+total # of seqs:        52420
 ````
 
 ## Error removal <a name="p5"></a>
@@ -303,19 +307,20 @@ remove.seqs(fasta=current, accnos=current)
 
 >summary.seqs(count=current)
 
-                Start   End     NBases  Ambigs  Polymer NumSeqs
-Minimum:        1       376     249     0       3       1
-2.5%-tile:      1       376     252     0       3       2954
-25%-tile:       1       376     252     0       4       29537
-Median:         1       376     252     0       4       59073
-75%-tile:       1       376     253     0       5       88609
-97.5%-tile:     1       376     253     0       6       115191
-Maximum:        1       376     256     0       8       118144
-Mean:   1       376     252.464 0       4.37541
-# of unique seqs:       2279
-total # of seqs:        118144
 
+                Start   End     NBases  Ambigs  Polymer NumSeqs
+Minimum:        1       359     249     0       3       1
+2.5%-tile:      1       359     252     0       3       1220
+25%-tile:       1       359     252     0       4       12193
+Median:         1       359     252     0       4       24386
+75%-tile:       1       359     253     0       5       36578
+97.5%-tile:     1       359     253     0       6       47551
+Maximum:        1       359     256     0       8       48770
+Mean:   1       359     252     0       4
+# of unique seqs:       1198
+total # of seqs:        48770
 ```
+
 vsearch removed 8.2% of the sequences (n=10511) and also removed the number of unique sequences which makes the processing easier.
 
 
@@ -337,19 +342,21 @@ remove.lineage(fasta=current, count=current, taxonomy=current, taxon=Chloroplast
 
 
 >summary.seqs(count=current)
-                Start   End     NBases  Ambigs  Polymer NumSeqs
-Minimum:        1       376     249     0       3       1
-2.5%-tile:      1       376     252     0       3       2950
-25%-tile:       1       376     252     0       4       29496
-Median:         1       376     252     0       4       58992
-75%-tile:       1       376     253     0       5       88487
-97.5%-tile:     1       376     253     0       6       115033
-Maximum:        1       376     256     0       6       117982
-Mean:   1       376     252.465 0       4.37191
-# of unique seqs:       2259
-total # of seqs:        117982
 
+
+                Start   End     NBases  Ambigs  Polymer NumSeqs
+Minimum:        1       359     249     0       3       1
+2.5%-tile:      1       359     252     0       3       1218
+25%-tile:       1       359     252     0       4       12179
+Median:         1       359     252     0       4       24358
+75%-tile:       1       359     253     0       5       36536
+97.5%-tile:     1       359     253     0       6       47497
+Maximum:        1       359     256     0       6       48714
+Mean:   1       359     252     0       4
+# of unique seqs:       1189
+total # of seqs:        48714
 ```
+
 The original Miseq tutorial explains how to use mock communities (artificial mixtures with known abundances) to calculate error rates. If you plan to use these type of positive controls  you can read the protocols [tutorial original de Mothur](https://www.mothur.org/wiki/MiSeq_SOP). 
 In this case we will simply remove the mock sequences from the analysis using the *remove.seqs* command.
 
@@ -382,6 +389,7 @@ Now we can use the distance matrices to generate the OTUs table. In this case, w
 ```
 make.shared(list=current, count=current, label=0.03)
 ```
+
 The generated table is all we need for diversity analysis. 
 
 The last step in the protocol is to classify each OTU. We will use the *classify.otu* command to generate a consensus classification for each OTU. 
