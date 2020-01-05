@@ -1,138 +1,161 @@
-# Procesamiento de datos de microbioma usando *Mothur*
-### Por Erick Cárdenas Poiré
+# Microbiome data processing using *Mothur*
+### By Erick Cárdenas Poiré
 
 
 ---
 
-# Tabla de contenidos
-1. [Introducción](#p1)
-2. [Preparativos](#p2)
-    1. [Instalación de *Mothur*](#p2.1)
-    2. [Archivos de referencia para *Mothur*](#p2.2)
-    3. [Secuencias y archivos relacionados](#p2.3)
-3. [Procesamiento inicial](#p3)
-   1. [Concatenación de pares](#p3.1)
-   2. [Remoción de secuencias anormales](#p3.2)
-   3. [Dereplicación](#p3.3)
-4. [Alineamiento](#p4)
-5. [Eliminación de errores](#p5)
-   1. [Reducción de ruido](#p5.1)
-   2. [Remoción de quimeras](#p5.2)
-   3. [Remoción de lineajes indeseados](#p5.3)
-6. [Creación de tablas de OTUs](#p6)
-7. [Creación de arboles filogenéticos](#p7)
-8. [Exportación de datos](#p8)
+# Table of contents
+1. [Introduction](#p1)
+2. [Preparation](#p2)
+    1. [*Mothur* installation](#p2.1)
+    2. [*Mothur* reference files](#p2.2)
+    3. [Sequences and related files](#p2.3)
+3. [Initial processing](#p3)
+   1. [Joining pairs](#p3.1)
+   2. [Removal of abnormal sequences](#p3.2)
+   3. [Dereplication](#p3.3)
+4. [Alignment](#p4)
+5. [Error removal](#p5)
+   1. [Noise removal](#p5.1)
+   2. [Chimera removal](#p5.2)
+   3. [Unwanted lineages removal](#p5.3)
+6. [OTU table creation(#p6)
+7. [Phylogenetic trees creation](#p7)
+8. [Data export](#p8)
 
-## Introducción  <a name="p1"></a>
-Este tutorial usa el programa *Mothur* para procesar archivos de secuenciación del gen de ARNr 16S. Este tutorial esta basado en el protocolo operativo estándar desarrollado por Patrick Schloss que se encuentra disponible [acá](http://www.mothur.org/wiki/MiSeq_SOP). 
+## Introduction  <a name="p1"></a>
 
-**Requisitos:**
-- Mothur instalado (ver abajo)
-- Archivos de referencia de Mothur (en la carpeta MiSeq_SOP_files)
-- Secuencias y archivos relacionados (en la carpeta MiSeq_SOP_files)
+This tutorial uses the *Mothur* program to process 16S rRNA gene sequencing data. This tutorial is based on the standard operational protocol developed by Patrick Schloss which is available [here.](http://www.mothur.org/wiki/MiSeq_SOP)
 
-## Preparativos <a name="p2"></a>
 
-Lo primero que hay que hacer es decidir donde poner todos los archivos para el tutorial. Lo ideal es crear un directorio de fácil acceso. Por ejemple podemos crear un directorio llamado *mothur* en el disco duro C.  
+**Requirements:**
+- Mothur installed (see below)
+- Mothur reference files (found in the MiSeq_SOP_files folder)
+- Sequences and related files (found in the MiSeq_SOP_files folder)
 
-### Instalación de *Mothur* <a name="p2.1"></a>
+## Preparation <a name="p2"></a>
 
-La versión mas reciente de *Mothur* se encuentra [acá](https://github.com/mothur/mothur/releases/latest).  Para ejecutar este tutorial es necesario bajar el archivo y descomprimirlo dentro de la carpeta de trabajo. Esta versión de *Mothur* no tiene interfaz gráfica sino que se ejecuta tipeando comandos en el terminal de mothur. Luego de descomprimir el archivo haz click en el y se vera lo siguiente:
+The first step is to decide where to store all the files for the tutorial, a working directory. We want to use folder easily accesible, e.g. a folder called *mothur* in the hard drive.
 
-![Imagen de Mothur prompt](https://carden24.github.com/images/Mothur.jpg) 
 
-Si es que esto no funciona se puede acceder a la terminal de windows directamente e iniciar *Mothur* desde ahí.
+### *Mothur* installation <a name="p2.1"></a>
 
-Para acceder al terminal desde windows apretar   **[Windows] + R**  
-Luego tipear **cmd** y apretar **Enter**
+The most recent version of *Mothur* can be found [here](https://github.com/mothur/mothur/releases/latest).  
+To run this tutorial we need to download the file and uncompress it inside the working directory.
 
-Por predeterminado nos encontramos en el directorio del usuario actual ````c:\Users\erick````
+This version of *Mothur* does not have a graphic interfase. Instead uses commmands that are typed at the *mothur* terminal.
+After uncompressing the file you should see something like this 
 
-Para movernos de directorio usamos el comando **cd**
+![Imagen de Mothur prompt](https://carden24.github.com/images/Mothur2.jpg) 
+
+If that does not work, we can access windows terminal directly and initialized *Mothur* from ther.
+
+To acess the Windows terminal presss  **[Windows] + R**  
+Then type **cmd** and press **Enter**
+
+We will be located by default at the folder of the current user ````c:\Users\erick````
+To move to another folder we use the command **cd**
 
 ````
-cd ..             Cambiamos al directorio de arriba
-cd c:\mothur      Cambiamos al directorio "mothur" en c:/
+cd ..             Change to the upper directory
+cd ..
+cd c:\mothur      Change directly to the folder "mothur" in c:/
 
 ````
 
-Cuando llegamos al directorio donde se encuentran los ejecutables de *Mothur* podemos iniciar el programa tipeando:
+After we get to the folder where the programs are stored we can run the program by typing:
 ````
 mothur.exe
 ````
 
-En esta nueva terminal es que tenemos que tipear los comandos. *Mothur* mantiene una lista de los ultimos archivos creados asi que no es necesario muchas veces retipear el nombre del archivo sino solo reemplazar su nombre con "current". Para saber cuales son los archivos o parametros  que *Mothur* considera como los mas actuales se puede usar el comando *get.current()*. Para cambiar estos parametros se puede usar el comando *set.current*.
+In this new terminal we have to type the *Mothur* commands. *Mothur* keeps a list of the latest files created so it is not necessary to retype the whole file nane, we can just replace the name with "current".  
+To know which files are the current ones we can use the commmand *get.current()*. To changes this parameters we use the command *set.current*.
 
-*Mothur* puede también recibir comandos directamente desde el terminal de Windows o ejecutar una serie de comandos escritos en un archivo de texto (un comando por linea). 
+*Mothur* can also use the commands directly from the Windows terminal or run a series of commands writen in a text file (one command per line).
 
 
 ````
+# Do not run these examples
+## To run one command
 mothur "#fastq.info(fastq=test.fastq);get.current()"
 
+## To run all the commands in a file
 mothur stability.batch
 ````
-
-El archivo *stability.batch* contiene todos los comandos necesarios para el procesamiento estándar y se puede reutilizar para analizar otras muestras siempre y cuando se cambie el contenido del archivo *stability.files* que tiene la lista de archivos de secuencias.
-
-### Archivos de referencia para *Mothur* <a name="p2.2"></a>
-
-*Mothur* necesita archivos extras para poder funcionar. Los archivos se encuentran en la carpeta MiSeq_SOP_files. Es necesario bajarlos y descomprimirlos en la carpeta de trabajo. Estos son los archivos que vamos a usar para el tutorial:
-
-- Alineamiento de referencia de *Silva* versión 102(Silva.bacteria.zip). Útil para tutorial, versiones mas recientes disponibles [acá](https://www.mothur.org/wiki/Silva_reference_files).
-- Taxonomía del RDP formateado para *Mothur* (Trainset14_032015.pds.zip). Mothur mantiene la lista de taxonomías del RDP [acá](https://www.mothur.org/wiki/RDP_reference_files). *Mothur recomienda* usar la taxonomia de Greengenes. *Mothur* mantiene una lista de las  versiones mas recientes [acá](https://www.mothur.org/wiki/Greengenes-formatted_databases).
+The *stability.batch* has all the commands needed for the standard protocols and can be reused to analyze other files as longs as we change the content of *stability.files* which has a list of the sequencing files.
 
 
-### Secuencias y archivos relacionados <a name="p2.3"></a>
+```
+For linux:
+mkdir mothur
+cd mothur
+mothur
+```
 
-Finalmente necesitamos bajar las secuencias de Miseq y archivos relacionados al experimento. El tutorial original usa 21 pares, esta usa 9 pares para hacer el tutorial mas corto.
+### *Mothur* reference files <a name="p2.2"></a>
 
-- Secuencias en formato fastq (Miseq SOP.zip)
-- Diseño experimental (mouse.time.design)
-- Metadatos (mouse.dpw.metadata)
-- stability.files (lista de archivos de secuencias)
 
-## Procesamiento inicial <a name="p3"></a>
+*Mothur* need some extra files to properly work.  These files can be found in the folder MiSeq_SOP_files.
+We need to get these files and uncompress them in the working folder.
 
-### Concatenación de pares <a name="p3.1"></a>
+These are the files we need:
 
-El comando *make.contigs* une el par de secuencias que provienen de la misma molécula. Los primers que se usan para amplificar la region V4 son los 515F y 806R por lo que el producto deber ser de unos 290 bases y al secuenciar este producto por ambos lados con secuencias de 250 bases crea un gran solapamiento. *Mothur* une las secuencias y usa los valores de calidad para asignar bases en la región que se sobrelapa.  
+- Reference alginment from *Silva* version 102 (Silva.bacteria.zip). More recent version of the aligment may be found [here.](https://www.mothur.org/wiki/Silva_reference_files)
+- Ribosomal database project (RDP) taxonomic scheme formatted for *Mothur* (Trainset14_032015.pds.zip). *Mothur* keeps a list of other taxonomics [here](https://www.mothur.org/wiki/RDP_reference_files). *Mothur* recommends using the *Greengenes* taxonomy. *Mothur* also keeps a list of more recent versions [here.] https://www.mothur.org/wiki/Greengenes-formatted_databases)
+
+
+### Sequences and related files  <a name="p2.3"></a>
+
+Finaly, we need to get the Miseq sequences and other files related to the experiment. The full tutorial uses 21 samples (two files per samples), we will use files for only nine samples to make the tutorial faster..
+
+- Sequences in fastq format (Miseq SOP.zip)
+- Experimental design file (mouse.time.design)
+- Metadata (mouse.dpw.metadata)
+- stability.files (a list of the sample files)
+
+## Initial processing <a name="p3"></a>
+
+### Joining pairs <a name="p3.1"></a>
+
+The command *make.contigs* joins the two files that correspond to each sample as they correspond to the same DNA molecule.
+The primers used to amplify the V4 region, 515F and 806R, create a product of roughly 290 bases. Since we sequence from each side with 250 bases there is a big overlap between the reads. *Mothur* joins tge reads and uses the quality information to asign bases in the overlapping regions.  
 
 
 ```
 make.contigs(file=stability.files, processors=2)
 ```
 
-Este comando también genera archivos que se necesitan después. 
-:
+The commenda created some files that are later used:
   
-- *stability.trim.contigs.fasta* : Nuevas secuencias unidas
-- *stability.contigs.groups* : El grupo al cual pertenece cada secuencias
-- *stability.contigs.report* : Reporte del proceso de concatenamiento
+- *stability.trim.contigs.fasta* : The newly joined sequence
+- *stability.contigs.groups* : The sample or group that each sequence belongs
+- *stability.contigs.report* : A report for the concatenation process
   
-Para crear estadisdicas de las secuencias usamos el comando *summary.seqs*
+To create stats for the sequences at this stage we used the command *summary.seqs*
 
 
 ```
 summary.seqs()
  
+
                 Start   End     NBases  Ambigs  Polymer NumSeqs
-Minimum:        1       248     248     0       3       1
-2.5%-tile:      1       252     252     0       3       3810
-25%-tile:       1       252     252     0       4       38091
-Median:         1       252     252     0       4       76181
-75%-tile:       1       253     253     0       5       114271
-97.5%-tile:     1       253     253     6       6       148552
-Maximum:        1       502     502     249     243     152360
-Mean:           1       252.811 252.811 0.70063         4.44854
-# of Seqs:      152360
- ```
-El resultado muestra que la mayoría de secuencias tienen entre 248 y 253 bases, y hay algunas secuencias que tienen hasta 502 bases lo cual sugiere que probablemente no se unieron bien ya que esperamos un producto de 290 bases como maximo.  
+Minimum:        1       249     249     0       3       1
+2.5%-tile:      1       252     252     0       3       1550
+25%-tile:       1       252     252     0       4       15492
+Median:         1       252     252     0       4       30983
+75%-tile:       1       253     253     0       5       46474
+97.5%-tile:     1       253     253     6       6       60416
+Maximum:        1       502     502     249     243     61965
+Mean:   1       252     252     0       4
+# of Seqs:      61965
+```
+
+The result shows that the majority of the sequences have between 249 and 253 bases, and that there are few sequences of up to 502 bases which suggest thtat they were not properly joined since we expected a 290 bases product.
 
  
-### Remoción de secuencias anormales <a name="p3.2"></a>
+### Removal of abnormal sequences <a name="p3.2"></a>
 
-Usamos el comando *screen.seqs*  para remover secuencias de acuerdo a su tamaño y el numero de bases ambiguas en ellas (Ns). Este paso remueve secuencias erróneas y artefactos. En este caso removemos secuencias con bases ambiguas y secuencias mas largas que 275 bp. Este numero depende del tamaño del la región definida por los primers.
-
+We will use the *screen.seqs* command to remove sequences according the their size and the number of ambigous bases per sequence (Ns). This step removes erronous sequences and artifacts. In this case we will sequences with any ambigous base and sequences longer than 275 bp. These parameters depend on the size of the amplified region (defined by the primers).
 
  
 ```
@@ -142,78 +165,72 @@ screen.seqs(fasta=current, group=current, summary=current, maxambig=0, maxlength
 >summary.seqs()
                 Start   End     NBases  Ambigs  Polymer NumSeqs
 Minimum:        1       250     250     0       3       1
-2.5%-tile:      1       252     252     0       3       3222
-25%-tile:       1       252     252     0       4       32219
-Median:         1       252     252     0       4       64437
-75%-tile:       1       253     253     0       5       96655
-97.5%-tile:     1       253     253     0       6       125651
-Maximum:        1       270     270     0       12      128872
-Mean:   1       252.462 252.462 0       4.36693
-# of Seqs:      128872
+2.5%-tile:      1       252     252     0       3       1313
+25%-tile:       1       252     252     0       4       13127
+Median:         1       252     252     0       4       26253
+75%-tile:       1       253     253     0       5       39379
+97.5%-tile:     1       253     253     0       6       51192
+Maximum:        1       259     259     0       11      52504
+Mean:   1       252     252     0       4
+# of Seqs:      52504
 ```
  
 
-### Dereplicación <a name="p3.3"></a>
+### Dereplication <a name="p3.3"></a>
 
-En este paso removemos secuencias idénticas para reducir la carga en la computadora. *Mothur* se encarga de acordarse de que hizo esto. 
-Este es un paso no cambia la calidad de las secuencias pero reduce la carga computacional (tiempo de procesamiento y memoria requerida).
+In this step we remove identical sequences to reduce the computational load. *Mothur* keeps track of the sequences removed when creating later results. This step does not change the final results or the quality of the sequences but reduced the processing time and the memory requirements.
 
 ```
 unique.seqs(fasta=current)
 ``` 
 
-El protocolo requiere que usemos *count.seqs* para crear una tabla que registra las secuencias repetidas.
+The protocol requires that we use the *count.seqs* command to create a table that records the identical sequences.
 
 ```
 count.seqs(name=current, group=current)
-
 ```
 
-## Alineamiento <a name="p4"></a> 
+## Alignment <a name="p4"></a> 
 
-En este paso alineamos nuestras secuencias con el alineamiento de referencia de SILVA, un alineamiento curado manualmente de gran calidad. Este es un archivo grande con casi 15000 secuencias y mas de 50000 posiciones. Para hacer nuestra trabajo mas fácil vamos a editar el alineamiento de Silva a las región que nos interesa (V4) y luego alinearemos nuestras secuencias con esta selección. Finalmente editaremos el alineamiento que incluye nuestras secuencias.  
+In this step, we aling our sequences against the reference alignment from Silva, a high-quality manualy curated alignment. This is a large files with almost 15000 sequences and over 50000 positions. To make our protocol easier, we can edit the alignment by trimming it to our region of interest (V4) and we later use this trimmed alignment with our sequences. After alignment, we will edit the new aligment which also includes our sequences.  
 
-
-El primer comando, *pcr.seqs*, edita el alineamiento de Silva a nuestra región de interés. Si es que no sabes las coordinadas de la región de interés, saltea el tutorial hasta el comando *align.seqs* y ahí usa la opción *reference=silva.bacteria.fasta*.
+To edit the alignment we can use *pcr.seqs* to trim the alignment to our region of interest, then we will rename the result with *rename.file*. If we do not know the coordinates of the region for the master alignment, we can just skip this part and go directly to the alignment step with the full master alignment.
 
 ```
+Do not run these commmands, we already have the final file. 
 pcr.seqs(fasta=silva.bacteria.fasta, start=11894, end=25319, keepdots=F)
-```
-
-Ahora podemos renombrar el nuevo archivo creado con algo mas fácil de entender usando el comando *rename.file*. 
-
-```
 rename.file(input=silva.bacteria.pcr.fasta, new=silva.v4.fasta)
-```
 
-Ahora podemos alinear las secuencias al alineamiento maestro de Silva para la region V4. 
+```
+We can now align the sequences to our V4-trimmed master aligment from Silva. 
 
 
 ```
 align.seqs(fasta=current, reference=silva.v4.fasta)
 ```
 
-Luego de alinear las secuencias podemos ejecutar *summary.seqs()* de nuevo  para ver estadísticas sobre distribución de las secuencias en el alineamiento. 
+After alignment, we can run again *summary.seqs()* to create statistics for the aligned sequences.
 
 ````
 summary.seqs(count=current)
 
                 Start   End     NBases  Ambigs  Polymer NumSeqs
-Minimum:        1250    10693   250     0       3       1
-2.5%-tile:      1968    11550   252     0       3       3222
-25%-tile:       1968    11550   252     0       4       32219
-Median:         1968    11550   252     0       4       64437
-75%-tile:       1968    11550   253     0       5       96655
-97.5%-tile:     1968    11550   253     0       6       125651
-Maximum:        1982    13400   270     0       12      128872
-Mean:           1967.99 11550   252.462 0       4.36693
-# of unique seqs:       16426
-total # of seqs:        128872
+Minimum:        1250    11546   250     0       3       1
+2.5%-tile:      1968    11550   252     0       3       1313
+25%-tile:       1968    11550   252     0       4       13127
+Median:         1968    11550   252     0       4       26253
+75%-tile:       1968    11550   253     0       5       39379
+97.5%-tile:     1968    11550   253     0       6       51192
+Maximum:        1982    11553   259     0       11      52504
+Mean:   1967    11549   252     0       4
+# of Seqs:      52504
 ````
 
-Al evaluar el alineamiento podemos ver que la mayoría de las secuencias empieza en la posición 1968 y termina en la posición 11550. Esta evaluación es útil detectar secuencias con muchas inserciones o que empiezan o terminan muy tarde. En este paso también podemos remover secuencias con muchos homopolímeros ya que estas tienden a ser erróneas.  
+These results show that the majority of the sequences start at position 1968 and end at position 11550. 
+This is useful to detect sequences with too many insertions or those that start very late. We can also see that there are few sequences with many homopolymers which tend to be erroneous. 
 
-Utilizamos entonces el comando *screen.seqs* para eliminar secuencias que empiezan mucho antes o terminan mucho despues ademas de secuencias con muchos homopolímeros.
+We use this information for the *screen.seqs* command.
+
 ```
 screen.seqs(fasta=current, count=current, start=1968, end=11550, maxhomop=8)
 
@@ -233,19 +250,19 @@ total # of seqs:        128655
 
 ```
 
-Ahora podemos editar el alineamiento y  remover posiciones que solo tienen gaps ya que no contribuyen con datos. El comando *screen.seqs* también necesita saber cual es el carácter que el alineamiento usa para indicar que no hay datos (trump character). En nuestro caso el alineamiento de Silva usa ".".
+Now we can edit the alignment to remove position that contain only gaps because they have no information. The *screen.seqs* command also need to know which character is used in the aligment to indicate that there is no information (trump character). In our case, Silva uses ".".
 
 ```
 filter.seqs(fasta=current, vertical=T, trump=.)
 ```
 
-Ejecutamos *unique.seqs* una vez mas ya que algunas secuencias pueden ser idénticas luego del alineamiento. 
+We run *unique.seqs* once again to since there are now identical sequences after the alignment and trimming step . 
 
 ```
 unique.seqs(fasta=current, count=current)
 ```
 
-Finalmente ejecutamos summary.seqs() y vemos que el alineamiento tiene muchas menos posiciones lo cual hace el calculo posterior mas fácil. 
+Finaly, we run *summary.seqs()* and see that the alignment has fewer position which makes the later stepts easier. 
 
 ````
 summary.seqs(count=current)
@@ -263,23 +280,23 @@ Mean:   1       376     252.462 0       4.36666
 total # of seqs:        128655
 ````
 
-## Eliminación de errores <a name="p5"></a>
+## Error removal <a name="p5"></a>
 
-Estos pasos reducen mejoran la calidad de los datos al eliminar errores de secuenciación, secuencias provenientes del anfitrión, y algunos artefactos generados por la PCR.  
+These steps improve the data quality by removing sequencing errors, host sequences, and few PCR artifacts.  
 
-### Reducción de ruido <a name="p5.1"></a>
+### Noise reduction <a name="p5.1"></a>
 
-El primer paso es agrupar secuencias altamente similares con *pre.cluster*. Este comando primero agrupa secuencias que difieran en unas cuantas posiciones, este caso no mas de dos diferencias (1 por cada 100 bases). Si hay varias secuencias similar el algoritmo escoge a la secuencia mas abundante como la secuencias correcta y asume que las demás son diferentes debido a errores de secuenciación. Este paso no remueve secuencias.
+The first step is to group highly similar sequences with *pre.cluster*. This command groups sequences that differ only in few positions, in thise case no more than two differences (roughly 1 for each 100 bases). For each of the highly-similar group of sequences, the algorithm picks the most abundant sequences as the correct one and asumes that the rest are different due to sequencing errors. This step does not remove sequences.
 
 ```
 pre.cluster(fasta=current, count=current, diffs=2)
 ```
 
-### Remoción de quimeras <a name="p5.2"></a>
+### Chimera removal <a name="p5.2"></a>
 
-Las quimeras son artefactos de la PCR creados cuando la secuencias de una especie se alinean con las de otra especies. El resultado de este encuentro casi amoroso es un artefacto que no representa la diversidad real de la comunidad.
+Chimeras are artifacts created during PCR when sequences derived from one species get align with those from other specie. The resulting product does not represent the real diversity of the community and needs to be removed.
+The first step detects the chimeras, and the second step removes them. The commands need to be used one after the other.
 
-El primer paso detecta las quimeras. El segundo las remueve. Deben ejecutarse uno después del otro   
 ```
 chimera.vsearch(fasta=current, count=current, dereplicate=t)
 remove.seqs(fasta=current, accnos=current)
@@ -299,13 +316,14 @@ Mean:   1       376     252.464 0       4.37541
 total # of seqs:        118144
 
 ```
-vsearch removió el 8.2% de las secuencias (n=10511), y se redujo además el numero de secuencias únicas lo cual hace mas fácil el proceso.  
+vsearch removed 8.2% of the sequences (n=10511) and also removed the number of unique sequences which makes the processing easier.
 
 
-### Remoción de lineajes indeseados <a name="p5.3"></a>
+### Unwanted lineages removal <a name="p5.3"></a>
 
-En algunos casos nuestra PCR puede amplificar secuencias de organelos del huésped (mitocondrias y cloroplastos), secuencias de arqueas o eucariotas (con menos especificidad y poca sensibilidad) y otros productos no especificos. Estas secuencias deben ser detectadas y removidas pues no representan a la comunidad microbiana.  
-El primer paso es clasificar todas las secuencias de la comunidad con *classify.sequences* y luego remover los lineajes no deseados con *remove.lineage*. El primer paso usa el método Bayesiano de clasificación, y la taxonomica de referencia del RDP. Esta taxonomía es útil para el tutorial pero se recomienda que para trabajos reales se use la taxonomía de *Greengenes* que clasifica hasta nivel de especies disponible [acá](https://www.mothur.org/wiki/Greengenes-formatted_databases). 
+In few case, the PCR can amplify sequences from the host organelles (mitochondria and chloroplast), sequences from archaeas or eukaryota(with smaller specificity and sensitivity) and other non-specific products. These sequences need to be identified and removed because they do not represent the microbial community.  
+
+The first step is to classify all the sequences with *classify.sequences* and later remove unwanted lineages with *remove.lineage*. The first step uses a Bayesian classification method and the RDP reference taxonomy. This taxonomy is useful for the tutorial but we recommend using the *Greengenes* taxonomy which classifies up to the species level. The files required for using the *Greengenes* taxonomy with *Mothur* can be found [here.](https://www.mothur.org/wiki/Greengenes-formatted_databases)
 
 
 ```
@@ -313,9 +331,10 @@ classify.seqs(fasta=current, count=current, reference=trainset14_032015.pds.fast
 remove.lineage(fasta=current, count=current, taxonomy=current, taxon=Chloroplast-Mitochondria-mitochondria-unknown-Archaea-Eukaryota)
 
 
-Si es que trabajamos con Greengenes
+If working with Greengenes:
 classify.seqs(fasta=current, count=current, reference=gg_13_8_99.fasta, taxonomy=gg_13_8_99.gg.tax, cutoff=80)
 remove.lineage(fasta=current, count=current, taxonomy=current, taxon=Chloroplast-Mitochondria-mitochondria-unknown-Archaea-Eukaryota)
+
 
 >summary.seqs(count=current)
                 Start   End     NBases  Ambigs  Polymer NumSeqs
@@ -331,69 +350,68 @@ Mean:   1       376     252.465 0       4.37191
 total # of seqs:        117982
 
 ```
-
-El tutorial de Miseq original explica como utilizar comunidades modelos (con abundancias definidas) para calcular tasas de error. Si es que planeas usar este tipo de control positivo puedes ver con mas detalles el análisis en el [tutorial original de Mothur](https://www.mothur.org/wiki/MiSeq_SOP). En este caso simplemente vamos a remover las  muestras que de comunidades modelos utilizando el comando *remove.seqs*. 
+The original Miseq tutorial explains how to use mock communities (artificial mixtures with known abundances) to calculate error rates. If you plan to use these type of positive controls  you can read the protocols [tutorial original de Mothur](https://www.mothur.org/wiki/MiSeq_SOP). 
+In this case we will simply remove the mock sequences from the analysis using the *remove.seqs* command.
 
 
 ```
 remove.groups(count=current, fasta=current, taxonomy=current, groups=Mock)
 ```
 
-## Creación de tablas de OTUS <a name="p6"></a>
+## OTU table creation <a name="p6"></a>
 
-El siguiente objetivo es agrupar las secuencias en unidades taxonómicas operacionales (OTUs), grupos de secuencias definidos por la similitud entre ellas. La forma tradicional es primero crear una matriz de distancias con *dist.seqs* y luego crear grupos de secuencias con esta matriz con *cluster*. Este método es muy lento cuando se trabajan con miles de secuencias ya que la matriz ocupa mucho espacio en memoria. 
+The next objetive is to group sequences in operational taxonomic units (OTUs), sequence groups defined by the similarity among them. Usually, the first step is to compare all sequences against each other to create a distance matrix (using *dist.seqs*) and later use the matrix to create group of sequences (using *cluster*). This method is slow when working with thousand of sequences since the matrix uses too much memory. 
 
 ````
-No ejecutar estos comandos !
+Do not run these
 dist.seqs(fasta=current, cutoff=0.03)
 cluster(column=current, count=current)
 
 ````
+A more appropriate altenative is to use *cluster.split*. This splits the matrix into groups defined by their taxonomic affiliation and later use the groups for clustering. We will use the taxonomic classification results to create group at taxonomic level of order  and later use the *opticlust* method to create OTUs. 
 
-La alternativa practica es usar *cluster.split*. Este método primero crea grupos basándose en la matriz de distancia o en la clasificación taxonómica de las secuencias y posteriormente aplica los métodos de agrupamientos sobre las selecciones individuales. Es este caso usaremos la clasificación taxonómica para separar los grupos a nivel de orden (nivel taxonómico), y luego aplicaremos el método algoritmo *opticlust* para crear OTUs. El comando *cluster.split* necesita una valor para saber hasta que porcentaje de similitud hay que crear las matrices de distancia. Para este algoritmo, cutoff=0.03 es suficiente, para el método *average neighbour* se recomiendan valores mas altos que el parametro final (usar 0.15 si es que se quiere trabajar a nivel de especies ).
+The *cluster.split* command needs to know the similarity threshold for the creation of the distance matrix. We will use "cutoff=0.03", which is appropriate for this method. For the *average neighbour* methodm, a higher parameter of 0.15 is recommended for working at species level.
 
 
 ```
 cluster.split(fasta=current, count=current, taxonomy=current, splitmethod=classify, taxlevel=4, cutoff=0.03)
 ```
 
-Ahora podemos usar las matrices de distancia para crear las tablas de OTUs. En este caso nos interesa trabajar a nivel de especie que es aproximadamente 3%.
-
+Now we can use the distance matrices to generate the OTUs table. In this case, we want to work at species level which is approximately 3%. 
 
 ```
 make.shared(list=current, count=current, label=0.03)
 ```
-La tabla que se genero es lo necesario para hacer los análisis de diversidad. 
+The generated table is all we need for diversity analysis. 
 
-El ultimo paso del protocolo es asignar una clasificación taxonómica a cada OTU. Para esto usaremos el comando *classify.otu* que genera para la clasificación de consenso para el OTU. 
+The last step in the protocol is to classify each OTU. We will use the *classify.otu* command to generate a consensus classification for each OTU. 
 
 ```
 classify.otu(list=current, count=current, taxonomy=current, label=0.03)
 ```
 
-## Creación de arboles filogenético <a name="p7"></a>
+## Phylogenetic trees creation <a name="p7"></a>
 
-Algunos métodos como Unifrac requieren saber la localización de cada OTU en un árbol filogenético de este proyecto. Este proceso se basa en el alineamiento y crea primero una matriz de distancias y luego usa esa matriz para crear un árbol basado en distancias (método Neighbour-joining).
+Some methods, such as UNIFRAC, require to know the place of each OTU in this project in a phylogenetic tree. To create this tree we use a distance-based tree method using our alignment and its corresponding distance matrix (Neighbour-joining method).
 
 ```
 dist.seqs(fasta=current, output=lt)
 clearcut(phylip=current)
 ```
 
-## Exportación de datos <a name="p8"></a>
+## Data export <a name="p8"></a>
 
-Mothur genera muchos archivos intermedios con nombres complicados. La forma mas fácil de transferir estos archivos a otros programas es convirtiéndolo a un objeto en formato biom. Este formato es una forma eficiente y facil de procesar (para las computadoras). Para mas información de este formato ver [acá] http://biom-format.org/documentation/biom_format.html. 
+*Mothur* generates many intermediate files with complicated names. An easy way to export the key information is to create a biom file. The biom format stores the information in a standard way which is easy to process by many other programs. More information on this format can be found [here.](http://biom-format.org/documentation/biom_format.html)
 
 
 ````
 make.biom(shared=current, constaxonomy=current, metadata=mouse.dpw.metadata)
-
 ````  
 
 
-## Análisis de filotipos   [Opcional]
+## Phylotype analysis   [Opcional]
 
-Si es que no nos interesa crear tablas de OTUs, especies definidas por similitud, sino trabajar con tablas de especies definidas por su clasificación taxonómica (filotipos) podemos usar los siguientes tres comandos con los datos ya procesados (sin artefactos y ruido).
+If we are not interested in creating an OTU table (species defined by their similarity), but work with species defined by their taxonomic classification (phylotypes), we can use the following commands on processed data (without noise and artifacts).
 
 ````
 phylotype(taxonomy=current, label=1);
@@ -401,23 +419,27 @@ make.shared(list=current, count=current);
 classify.otu(list=current, taxonomy=current);
 ````
 
-El primer comando agrupa las secuencias según su taxonomía, la opción "label=1" especifica que vamos a trabajar con la taxonomía mas especifica. Si es que no especificamos este parámetro el resultado va crear listas de secuencias a diferente niveles de taxonomía. 
-El segundo comando crea la tabla de filotipos x muestras. El último comando crea otra tabla con la taxonomía de consenso del filotipo.
-Hay que ser cuidadoso en escoger la tabla con la cual trabajar ya que tienen nombres similares.
+The first command group sequences according to their taxonomy, the option "label=" specifies that we will use the most specific taxonomy. If we do not specy this, the results are going to be list of sequences at different levels of taxonomy.  
+The second command, creates the phylotype x samples table. The last command creates another table with the consensus classification for each phylotype. We need to be careful to select the correct files since the names are very similar.
 
 ```
-Archivos "Shared":
-stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.unique_list.shared  <-Basado en OTUs
+"Shared" files:
+# Based on OTUs
+stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.unique_list.shared
+# Based on phylotypes
 stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pds.wang.pick.pick.tx.shared           <-Basado en filotipos
 
-Archivos de taxonomia de consenso
-stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pds.wang.pick.pick.tx.1.cons.tax.summary              <-Basado en OTUs
-stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.unique_list.0.03.cons.tax.summary  <-Basado en filotipos
+# Consensus taxonomy files:
+# Based on OTUs
+
+stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pds.wang.pick.pick.tx.1.cons.tax.summary
+# Based on phylotypes
+stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.unique_list.0.03.cons.tax.summary
 
 ```
 
-**Recomendación final**
-Una vez terminado el procesamiento hay que grabar los fastq originales, la lista de comando que usamos, los logs del programa (que tienen los comandos y los resultados), las tablas de OTUs (archivos SHARED), la clasificación de los OTUs (.cons.tax.summary), los metadatos, y el árbol filogenetico (archivo .phylip.tre) si es que nos interesa usar indices como UNIFRAC. Todos los demás resultados se puede borrar o comprimir.
+**Final recommendations**
+Once we finish the processing we recommend saving the original fastq files (we usually need to submit them for publication), the list of commands that we used (to replicate the process), the computer logs (".logfile"), the OTU table (".shared"), the consensus classification for the OTUs (".cons.tax.summary"), the metadata, and the phylogentic tree (".phylip.tre") if we are interested in using UNIFRAC. The rest of the files can be deleted or compressed for storage.
  
 
 

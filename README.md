@@ -28,5 +28,5 @@ Publication, books, and other tools organized by themes. Including
   A short book on diversity analysis. Contains detailed explanation and code to make diversity analysis in R.
   This book can also be found freely [here.](<http://www.worldagroforestry.org/output/tree-diversity-analysis>)
 - *The madness of microbiome : Attempting to find consensus “best practice” for 16S microbiome studies*, by Jolinda Pollock, Laura Glendinning, Trong Wisedchanwe, and Mick Watson.  
-  A review on topics to considere when doing microbiome studies. Includes topics such as data storgae,  DNA extraction, analysis, etc.  
+  A review on topics to considere when doing microbiome studies. Includes topics such as data storgae, DNA extraction, analysis, etc.  
 - *Multivariate analyses in microbial ecology* by Alban Ramette. A minireview also found [here.](<http://dx.doi.org/10.1111/j.1574-6941.2007.00375.x>)
