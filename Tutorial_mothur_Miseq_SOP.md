@@ -70,20 +70,6 @@ mothur.exe
 In this new terminal we have to type the *Mothur* commands. *Mothur* keeps a list of the latest files created so it is not necessary to retype the whole file name, we can just replace the name with "current".  
 To know which files are the current ones we can use the command *get.current()*. To changes this parameters we use the command *set.current*.
 
-*Mothur* can also use the commands directly from the Windows terminal or run a series of commands written in a text file (one command per line).
-
-
-````
-# Do not run these examples
-## To run one command
-mothur "#fastq.info(fastq=test.fastq);get.current()"
-
-## To run all the commands in a file
-mothur stability.batch
-````
-The *stability.batch* has all the commands needed for the standard protocols and can be reused to analyze other files as longs as we change the content of *stability.files* which has a list of the sequencing files.
-
-
 
 ### *Mothur* reference files <a name="p2.2"></a>
 
@@ -289,7 +275,7 @@ pre.cluster(fasta=current, count=current, diffs=2)
 
 ### Chimera removal <a name="p5.2"></a>
 
-Chimeras are artifacts created during PCR when sequences derived from one species get aligned with those from other species. The resulting product does not represent the real diversity of the community and needs to be removed. The first command we will use detects the chimeras, and the second one removes them. Theese commands need to be used one after the other.
+Chimeras are artifacts created during PCR when sequences derived from one species get aligned with those from other species. The resulting product does not represent the real diversity of the community and needs to be removed. The first command we will use detects the chimeras, and the second one removes them. These commands need to be used one after the other.
 
 ```
 chimera.vsearch(fasta=current, count=current, dereplicate=t)
@@ -301,14 +287,14 @@ remove.seqs(fasta=current, accnos=current)
                 Start   End     NBases  Ambigs  Polymer NumSeqs
 Minimum:        1       359     249     0       3       1
 2.5%-tile:      1       359     252     0       3       1220
-25%-tile:       1       359     252     0       4       12193
-Median:         1       359     252     0       4       24386
-75%-tile:       1       359     253     0       5       36578
-97.5%-tile:     1       359     253     0       6       47551
-Maximum:        1       359     256     0       8       48770
+25%-tile:       1       359     252     0       4       12192
+Median:         1       359     252     0       4       24383
+75%-tile:       1       359     253     0       5       36574
+97.5%-tile:     1       359     253     0       6       47546
+Maximum:        1       359     256     0       8       48765
 Mean:   1       359     252     0       4
-# of unique seqs:       1198
-total # of seqs:        48770
+# of unique seqs:       1196
+total # of seqs:        48765
 ```
 
 
@@ -335,14 +321,14 @@ remove.lineage(fasta=current, count=current, taxonomy=current, taxon=Chloroplast
                 Start   End     NBases  Ambigs  Polymer NumSeqs
 Minimum:        1       359     249     0       3       1
 2.5%-tile:      1       359     252     0       3       1218
-25%-tile:       1       359     252     0       4       12179
-Median:         1       359     252     0       4       24358
-75%-tile:       1       359     253     0       5       36536
-97.5%-tile:     1       359     253     0       6       47497
-Maximum:        1       359     256     0       6       48714
+25%-tile:       1       359     252     0       4       12178
+Median:         1       359     252     0       4       24355
+75%-tile:       1       359     253     0       5       36532
+97.5%-tile:     1       359     253     0       6       47492
+Maximum:        1       359     256     0       6       48709
 Mean:   1       359     252     0       4
-# of unique seqs:       1189
-total # of seqs:        48714
+# of unique seqs:       1187
+total # of seqs:        48709
 ```
 
 The original Miseq tutorial explains how to use mock communities (artificial mixtures with known abundances) to calculate error rates. If you plan to use these type of positive controls  you can read the original tutorial [here.](https://www.mothur.org/wiki/MiSeq_SOP)
@@ -405,7 +391,7 @@ make.biom(shared=current, constaxonomy=current, metadata=mouse.dpw.metadata)
 ````  
 
 
-## Phylotype analysis   [Opcional]
+## Phylotype analysis [Opcional]
 
 If we are not interested in creating an OTU table (species defined by their similarity), but work with species defined by their taxonomic classification (phylotypes), we can use the following commands with processed data (without noise and artifacts).
 
@@ -436,3 +422,15 @@ stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.
 **Final recommendations**
 Once we finish the processing, we recommend saving the original fastq files (we usually need to submit them for publication), the list of commands that we used (to replicate the process), the computer logs (".logfile"), the OTU table (".shared"), the consensus classification for the OTUs (".cons.tax.summary"), the metadata, and the phylogenetic tree (".phylip.tre") if we are interested in using UNIFRAC. The rest of the files can be deleted or compressed for storage.
  
+
+*Mothur* can also use the commands directly from the Windows terminal or run a series of commands written in a text file (one command per line).
+
+````
+# Do not run these examples
+## To run one command
+mothur "#fastq.info(fastq=test.fastq);get.current()"
+
+## To run all the commands in a file
+mothur stability.batch
+````
+The *stability.batch* has all the commands needed for the standard protocols and can be reused to analyze other files as longs as we change the content of *stability.files* which has a list of the sequencing files.

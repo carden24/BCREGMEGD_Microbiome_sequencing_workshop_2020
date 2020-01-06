@@ -1,138 +1,144 @@
-# Análisis de comunidades microbianas con *Phyloseq*
-### Por Erick Cardenas Poire
+# Microbial community analysis with *Phyloseq*
+### By Erick Cardenas Poire
 
 ---
 
-# Tabla de contenidos
-1. [Introducción](#p1)
-2. [Preparativos](#p2)
-3. [Creación de objeto Phyloseq](#p3)
-    1. [Importación de datos](#p3.1)
-    2. [Accesión de componentes](#p3.2)
-4. [Preparación de datos](#p4)
-    1. [Filtración de muestras](#4.1)
-    2. [Filtración de OTUs](#p4.2)
-    3. [Normalización](#p4.3)
-5. [Visualización de comunidades](#p5)
-6. [Diversidad alfa](#p6)
-7. [Ordenaciones libres](#p7)
-8. [Pruebas de hipótesis](#p8)
+# Table of contents
+1. [Introduction](#p1)
+2. [Preparation](#p2)
+3. [Creation of a Phyloseq object](#p3)
+    1. [Data import](#p3.1)
+    2. [Accessing components](#p3.2)
+4. [Data preparation](#p4)
+    1. [Sample filtering](#4.1)
+    2. [OTU filtering](#p4.2)
+    3. [Normalization](#p4.3)
+5. [Visualization of communities](#p5)
+6. [Alpha diversity](#p6)
+7. [Unconstrained ordinations](#p7)
+8. [Hypothesis testing](#p8)
     1. [PERMANOVA](#p8.1)
-    2. [Análisis de dispersión](#p8.2)
+    2. [Dispersion analysis](#p8.2)
     3. [ANOSIM](#p8.3)
-9. [Ordenaciones restringidas](#p9)
-10. [Datos de la sesión](#p10)
+9. [Constrained analysis](#p9)
+10. [Session information](#p10)
 
-## Introducción <a name="p1"></a>
-Este tutorial cubre el análisis de datos de comunidades microbianas usando el paquete *Phyloseq* en R. Los datos provienen del procesamiento de datos de Illumina Miseq on el programa *Mothur*. El tutorial esta basado parcialmente en el tutorial de *Phyloseq* por Michelle Berry disponible [acá](http://deneflab.github.io/MicrobeMiseq/demos/mothur_2_phyloseq.html).
+## Introduction <a name="p1"></a>
 
-*Phyloseq* es un paquete para R enfocado en el análisis de datos de censos de microbioma. El articulo original se encuentra en la carpeta *Recursos* de este repositorio. Para mas detalles ir a su página original [acá](http://joey711.github.io/phyloseq/).
+This tutorial covers the analysis of microbial community data using package *Phyloseq* in R. The tutorial is partialy based on the *Phyloseq* tutorial developed by Michelle Berry available [here.](http://deneflab.github.io/MicrobeMiseq/demos/mothur_2_phyloseq.html)
 
-La gran ventaja que provee *Phyloseq* es que crea un objeto que organiza y agrupa todos los datos relevantes de un experimento: tablas de OTUs, metadatos, la clasificación de los OTUs, y un árbol filogenético con todos los representantes de los OTUs. *Phyloseq* provee además funciones especializadas para la importación, exportación, manipulación, y visualización de datos de microbioma.
 
-**Esquema de un objeto de clase Phyloseq**  
+*Phyloseq* is an R package focused on analysis of microbiome census data. The original paper can be found in the *Resources* folder in this repository. For more information on *Phyloseq* go [here.](http://joey711.github.io/phyloseq/)
+
+The main advantage of using *Phyloseq* it that it creates an object that groups and organizes all the key data for a microbiome study: the OTUs table, metadata, taxonomic classification of the OTUs, and a phylogenetic tree for the OTU representative sequences. *Phyloseq* provides specialized functions for import, export, manipulation, and visualization of microbiome data.
+
+**Phyloseq-class object scheme**  
 ![Imagen de objeto Phyloseq](https://carden24.github.com/images/Phyloseq.jpg)  
 
 
-## Preparativos <a name="p2"></a>
+## Preparation <a name="p2"></a>
 
-El primer paso recomendado es establecer el directorio o carpeta de trabajo. En este directorio R busca los archivos y es también ahí donde se guardan los resultados exportados. Es recomendado que en general la creación de una carpeta por cada análisis mayor e idealmente guardar ahí también el script de análisis.  
+The first recommended step is to set the working directory. This is the directory where *R* looks for files and where it sabes the exported results. We recommend that you create a working directory for each major analysis and that you also store there the analysis scripts.
 
-Abrir Rstudio y ahí crear un nuevo script en blanco con **Ctrl** + **Shift** + **N**. Es acá donde vamos a ir escribiendo los comandos y ejecutando cada linea con **Ctrl** + **R**. En R el símbolo **#** es usado para anotar la linea de código. Todo lo que viene después del "#" es ignorado por el programa pero es útil para saber la función de la linea o bloque de código.
+Open *RStudio*, and create a new *R* script with **Ctrl** + **Shift** + **N**. This is where we will write the commands and execute each line with **Ctrl** + **R**. In *R* the symbol **#** is used to add comments to that line of code. Everything that comes after the "#" is ignored by the program but it is useful for us to know what we did for each line or block code.
 
-````
-setwd("E:/Libraries/Dropbox/tutorial/") # Este es mi directorio de trabajo, escoge el mas apropiado para tu trabajo
-getwd() # Este comando reporta el directorio actual.
 
 ````
+setwd("E:/Libraries/Dropbox/tutorial/") # This is my working directory, change it to something more useful for you
+getwd() # This command report me with current working directory
 
-El segundo paso es cargar la librería *Phyloseq* para tener acceso a las funciones requeridas
+````
+
+The second step is to load the *Phyloseq* library to access the functions required for the tutorial.
+
 ````
 library(phyloseq)
-library(ggplot2) # Este paquete es requerido para gratificar los resultados
-library(vegan) # Este es un paquete para análisis de diversidad
-library(tidyr) # Estos son dos paquetes de transformación de datos
+library(ggplot2) # This package is required for data visualization
+library(vegan) # This package is required for the diversity analysis
+library(tidyr) # These two package help with data manipulation
 library(dplyr))
 
 ````
 
-Finalmente vamos a cargar unas funciones contenidas en el archivo "miseqR.R". Estas funciones provienen del tutorial original y son herramientas útiles. El archivo debe estar en el directorio de trabajo para que R lo pueda encontrar. Los archivos requeridos para este tutorial se encuentran en la carpeta "Archivos_Phyloseq" del [repositorio del taller](https://github.com/carden24/2018_Taller_Genomica_ambiental).
+Finaly, we will load some custom functions that are stored in the "miseqR.R". These functions come from the original tutorial and are just useful tools. The file should be saved in the working directory for *R* to find it. The files required for this tutorial can be found in the "Phyloseq_files" folder of this[workshop repository.](https://github.com/carden24/BCREGMEGD_Microbiome_sequencing_workshop_2020)
 
 
 ````
 source("miseqR.R")
 ````
 
-## Creación de objeto Phyloseq <a name="p3"></a>
+## Creation of a Phyloseq object <a name="p3"></a>
 
-### Importación de datos <a name="p3.1"></a>
+### Data import <a name="p3.1"></a>
 
-*Phyloseq* tiene una función para la importación de archivos de *Mothur*. Es necesario copia y pegar los archivos de la sesión anterior en la carpeta de trabajo y luego usar el siguiente código en R. Si no encuentras los archivos necesarios puedes acceder a ellos [acá](https://github.com/carden24/2018_Taller_Genomica_ambiental).
+*Phyloseq* has a handy function to import files from *Mothur*. So, we need to move the final *Mothur* files to the *R* working directoy and use the code below. The files can also be found in the "Phyloseq_files" folder [here.] (https://github.com/carden24/BCREGMEGD_Microbiome_sequencing_workshop_2020/tree/master/Phyloseq_files)
+
 
 ````
-# Crear variables para los archivos que exportamos de Mothur
-shared_file = "stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.unique_list.shared"
-tax_file = "stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.unique_list.0.03.cons.taxonomy"
+# Create variables for the files we will import from Mothur
+shared_file = "stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.shared"
+tax_file = "stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons.taxonomy"
 metadata_file = "mouse.dpw.metadata"
-biom_file = "stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.unique_list.0.03.biom"
+biom_file = "stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.biom"
 tree_file = "stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.phylip.tre"
 
-# Importar un objeto biom
+# Import from the biom file
 data = import_biom(biom_file)
 
-> data
-phyloseq-class experiment-level object
-otu_table()   OTU Table:         [ 522 taxa and 19 samples ]
-sample_data() Sample Data:       [ 19 samples by 1 sample variables ]
-tax_table()   Taxonomy Table:    [ 522 taxa by 6 taxonomic ranks ]
+data
+# phyloseq-class experiment-level object
+# otu_table()   OTU Table:         [ 522 taxa and 19 samples ]
+# sample_data() Sample Data:       [ 19 samples by 1 sample variables ]
+# tax_table()   Taxonomy Table:    [ 522 taxa by 6 taxonomic ranks ]
 ````
 
-Alternativamente podemos agregar cada elemento individualmente si que no tenemos un archivo biom
+Alternatively we can add each element individually if we do not have the biom file. Please note that the biom file did not have the phylogenetic tree.
 
 ````
-# Importando los datos de Mothur
+# Importing Mothur files
 mothur_data0 <- import_mothur(mothur_shared_file = shared_file,
                              mothur_constaxonomy_file = tax_file)
 
-# Y ahora agregamos los metadatos
+# Adding metadata
 
-metadata = read.delim(metadata_file, header=T,row.names = 1)
-metadata = sample_data(metadata) # Convierta la tabla de metadatos en una tabla para phyloseq
+metadata = read.delim(metadata_file, header=T, row.names=1)
+metadata = sample_data(metadata) # Converts the metadata table into a metadata table ready for *Phyloseq*
 mothur_data = merge_phyloseq(mothur_data0, metadata)
 
 mothur_data
-#otu_table()   OTU Table:         [ 522 taxa and 19 samples ]
-#sample_data() Sample Data:       [ 19 samples by 1 sample variables ]
-#tax_table()   Taxonomy Table:    [ 522 taxa by 6 taxonomic ranks ]
+# otu_table()   OTU Table:         [ 522 taxa and 19 samples ]
+# sample_data() Sample Data:       [ 19 samples by 1 sample variables ]
+# tax_table()   Taxonomy Table:    [ 522 taxa by 6 taxonomic ranks ]
 ````
 
-### Accesión de componentes<a name="p3.2"></a>
+### Accessing components <a name="p3.2"></a>
 
-El objeto *mothur_data* es un objeto de clase *Phyloseq* de nivel experimento. Para ver la estructura de este objeto simplemente podemos escribir su nombre en la consola.
+The *mothur_data* object is a *Phyloseq*-class object of experiment-level. To see the structure of this object we simply type its name and run the line. 
+
 
 ````
 mothur_data
-#phyloseq-class experiment-level object
-#otu_table()   OTU Table:         [ 522 taxa and 19 samples ]
-#tax_table()   Taxonomy Table:    [ 522 taxa by 6 taxonomic ranks ]
-````
+# otu_table()   OTU Table:         [ 522 taxa and 19 samples ]
+# sample_data() Sample Data:       [ 19 samples by 1 sample variables ]
+# tax_table()   Taxonomy Table:    [ 522 taxa by 6 taxonomic ranks ]
+```
 
-Una vez que tenemos este objeto podemos usar diferente funciones para acceder a los diferentes componentes del objeto
+Once we have this object we can use several function to access the different components of the object.
 
 ```
-# Poner dentro del paréntesis el nombre del objeto !
+# Basic functions, just put the name of the object inside the parenthesis
+ 
+otu_table(mothur_data)			# Reports the OTU table
+sample_data(mothur_data) 		# Reports the sample information such as experimental design or metadata
+tax_table(mothur_data)   		# Reports the taxonomic classification of each OTUs
 
-otu_table(mothur_data)			# Reporta la tabla de OTUs
-sample_data(mothur_data) 			# Reporta la información sobre las muestras como metadatos o datos experimentales
-tax_table(mothur_data)   			# Reporta la tabla de taxonómica de los OTUs
+ntaxa(mothur_data) 			# Number of OTUs
+nsamples(mothur_data) 			# Number of samples
 
-ntaxa(mothur_data) 			# Reporta el numero de OTUs
-nsamples(mothur_data) 			# Reporta el numero de muestras
+sample_names(mothur_data)			# Sample names
+taxa_names(mothur_data) 			# Taxa names
 
-sample_names(mothur_data)			# Reporta los nombres de las muestras
-taxa_names(mothur_data) 			# Reporta los nombres de los taxones
-
-taxa_sums(mothur_data)  	# Reporta la suma de abundancias de un OTU para todas las muestras
+taxa_sums(mothur_data)  	# Sum of abundances or an OTU for all the samples
 ````
 
 Cuando accedemos a la tabla de taxonomía podemos ver que los nombres de los niveles no son informativos así que podemos cambiarlos a algo mas útil
