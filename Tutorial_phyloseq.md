@@ -15,7 +15,7 @@
     3. [Normalization](#p4.3)
 5. [Visualization of communities](#p5)
 6. [Alpha diversity](#p6)
-7. [Unconstrained ordinations](#p7)
+7. [Beta diversity](#p7)
 8. [Hypothesis testing](#p8)
     1. [PERMANOVA](#p8.1)
     2. [Dispersion analysis](#p8.2)
@@ -141,12 +141,13 @@ taxa_names(mothur_data) 			# Taxa names
 taxa_sums(mothur_data)  	# Sum of abundances or an OTU for all the samples
 ````
 
-Cuando accedemos a la tabla de taxonomía podemos ver que los nombres de los niveles no son informativos así que podemos cambiarlos a algo mas útil
+When we access the taxonomy table we can see that the names of the ranks are not information so we are going to change them to something more useful.
  
 ````
-colnames(tax_table(mothur_data)) # Reporta los nombres de los taxones
+colnames(tax_table(mothur_data)) # Reports the names of the taxonomic ranks
 #[1] "Rank1" "Rank2" "Rank3" "Rank4" "Rank5" "Rank6"
 
+# Replacing the names
 colnames(tax_table(mothur_data)) <- c("Kingdom", "Phylum", "Class", 
                                       "Order", "Family", "Genus")
 
@@ -154,10 +155,10 @@ colnames(tax_table(mothur_data))
 #[1] "Kingdom" "Phylum"  "Class"   "Order"   "Family"  "Genus" 
 ````
 
-## Preparación de datos <a name="p4"></a>
+## Data preparation <a name="p4"></a>
 
-Para la siguiente parte del tutorial vamos a trabajar con dos sets de datos mas interesante  
 Podemos cargar el set que viene con *Phyloseq*
+For the next part of the tutorial we will use more interesting data that come as example in the *Phyloseq* package. We will load the "GlobalPatterns" and "soilrep" datasets. The first one comes from a 2011 [publication] (http://www.pnas.org/content/108/suppl.1/4516.short) comparing 25 environmental samples and three known “mock communities” – a total of 9 sample types. The second dataset come from a 2011 [paper](http://www.nature.com/ismej/journal/v5/n8/full/ismej201111a.html) which compared 24 separate soil microbial communities under four treatment conditions.
 
 ````
 data("GlobalPatterns")
@@ -174,34 +175,33 @@ soilrep
 #sample_data() Sample Data:       [ 56 samples by 4 sample variables ]
 ````
 
-Antes de empezar con la filtración vamos a ver la distribución de las lecturas por muestra con un histograma. Para esto creamos una tabla con una columna llamada "sum" que muestra la cantidad de lecturas por muestra.
+The first thing we can do is to check the read distribution for the samples. We will create a table with a column called "sum" and visualize this data.
 
-````
+```
 sample_sum_df <- data.frame(sum = sample_sums(soilrep)) 
 
-# Media, máxima y mínima
+# Exploring mean, maximum, and minimum
 min(sample_sum_df$sum)
 median(sample_sum_df$sum)
 max(sample_sum_df$sum)
 
 
-# Histograma de lecturas por muestra
+# Reads per samples histogram
 ggplot(sample_sum_df, aes(x = sum)) + 
   geom_histogram(color="Black", binwidth = 500) +
   ggtitle("Distribution of sample sequencing depth") + 
   xlab("Read counts")  + ylab("Frequency")
+```
+
+![Read distribution graph](https://carden24.github.com/images/distribucion_lecturas.png) 
+
+
+### Selecting and filtering samples <a name="p4.1"></a>
+
+If there are samples with very few sequences or controls, we can remove them from the dataset using the *prune_samples()* command. This command accepts as input a list of samples or a list with TRUE/FALSE.
+
 ````
-
- 
-![Imagen de objeto Phyloseq](https://carden24.github.com/images/distribucion_lecturas.png) 
-
-
-### Selección y Filtración de muestras <a name="p4.1"></a>
-
-Si es que hay muestras con pocas lecturas o controles podemos removerlas del set de datos usando el comando *prune_samples()*. Este comando puede utilizar una lista de muestras o también una lista de Verdaderos/FALSO
-
-````
-# Si quisiéramos remover del set de mothur las muestras que tengan menos de 3000 lecturas
+# To remove samples with fewer than 300 reads
 mothur_data2 = prune_samples(names(which(sample_sums(mothur_data) >= 3000)), mothur_data)
 
 mothur_data
@@ -217,23 +217,24 @@ mothur_data2
 #tax_table()   Taxonomy Table:    [ 522 taxa by 6 taxonomic ranks ]
 ````
 
-Para seleccionar muestras usamos el comando *subset_sample()*
+To select samples we use*subset_sample()*
 
 ````
-# Seleccionando muestras según los metadatos
+# Selecting samples according to their metadata, in this case we want only soil samples
 global_soil <- GlobalPatterns %>%
   subset_samples(SampleType == "Soil") %>%
   prune_taxa(taxa_sums(.) > 0, .)
 ````
 
 
-### Selección y filtración de OTUs <a name="p4.2"></a>
+### Selecting and filtering OTUs <a name="p4.2"></a>
 
-Para filtrar OTUs usamos el comando *prune_taxa()*
+To filter OTUs we use *prune_taxa()*
 
 ````
-# Este comando remuevo OTUs que contribuyan con menos de 5 lecturas a todo el set
+# The following line removes OTUs that have five or fewer reads in the whole dataset
 mothur_data3 = prune_taxa(names(which(taxa_sums(mothur_data) >= 5)), mothur_data2)
+
 mothur_data3
 #phyloseq-class experiment-level object
 #otu_table()   OTU Table:         [ 247 taxa and 17 samples ]
@@ -241,57 +242,57 @@ mothur_data3
 #tax_table()   Taxonomy Table:    [ 247 taxa by 6 taxonomic ranks ]
 ````
 
-Si es que queremos separa grupo de OTUs de una taxonomía determinada usamos el comando *subset_taxa()*. Esto es útil si por ejemplo queremos visualizar por separado la distribución de un grupo taxonómico.
+If we want to select a group of OTUs with a specific taxonomy, we use *subset_taxa()*. This is useful if we want to visualize separately the distribution of a taxonomic group e.g. to visualize a low abundance group that will get lost in a general distribution graph.
+
 
 ````
-# Uso:
-# objecto_nuevo = subset_taxa(objeto, Condición)
+# Usage:
+# new_object = subset_taxa(object, Condition)
 
-# Este comando separa todos las Actinobacteria seleccionando los OTUs cuyo Phylum es Actinobacteria
+# This line will select all OTUs whose Phylum is Actinobacteria
 Actinobacteria = subset_taxa(GlobalPatterns, Phylum == "Actinobacteria")
 
-# Este comando separa todos las Pseudomonas seleccionando los OTUs cuyo género es Actinobacteria
+# This line will get all Pseudomonas by selecting OTUs whose Genus is Pseudomonas
 Pseudomonas = subset_taxa(GlobalPatterns, Genus == "Pseudomonas")
 ````
 
-### Normalización <a name="p4.3"></a>
-Es muy común convertir los datos a abundancias relativas, o usar otras transformaciones para cumplir asunciones estadísticas. Para esto utilizamos el comando transform_sample_counts(). Este comando a pesar que usa el objeto experimento solo modifica los datos de la tabla de OTU y no la tabla de metadatos. 
+### Normalization <a name="p4.3"></a>
+
+Sometimes it is useful to convert our count data into relative abundances or to use other transformations to satisfy statistical assumptions. For this we will use *transform_sample_counts()*. This commands modifies only the OTU table and not the metadata table
 
 ````
-# Esta linea usa un objeto phyloseq y transforma las cuentas de lecturas en abundancia relativa de lecturas. 
+# The next line  will take a phyloseq object and transform counts into relative abundance (0 - 1 range)
 rel_abun_soil =  transform_sample_counts(soilrep, function(x) {x/sum(x)}) 
 
-# Esta linea convierte las cuentas con la función raíz cuadrada
+# The next line will do a square-root transformation of the counts
 rel_abun_sqrt_soil =  transform_sample_counts(rel_abun_soil, function(x) sqrt(x))
 ````
 
-Otra alternativa es rareficar las muestras usando el comando *rarefey_even_depth()*, el cual tomara secuencias al azar para que todas las muestras tengan la misma cantidad de secuencias. 
+Another alternative is to rarify the counts using *rarefey_even_depth()*, this randomly take sequences from each sample so all of them have the same number of sequences. This is useful for alpha diversity calculations if there are major differences in sequence depth.
 
 ````
 rare_soil <-rarefy_even_depth(soilrep, rngseed=TRUE)
 ````
 
-## Visualización de comunidades <a name="p5"></a>
+## Community visualization <a name="p5"></a>
 
-Para gráficas de barra de abundancia relativa podemos utilizar el comando *plot_bar()* con objetos phyloseq. Esta función también acepta opciones para cambiar el color de relleno de las barras(e.g. fill="Phylum"), y puede separar las barras según otros factores 
-Con este comando podemos graficar directamente o crear un objeto de tipo ggplot2 que podemos modificar.
+A common way to visualize the whole community is by using bar plot with the *plot_bar()* command. This function also accepts options to change the bar colors or to separate the plot according to experimental factors present in the phyloseq object. Plot object can be further modified with ggplot2 parameters.
+
 
 ````
-# Gráfica a nivel de phyla
-# Aglomeramos los datos al nivel taxonómico de Phylum
+# Creating a phyla level plot
+# Collapse data at Phylum level
 global_phyla = tax_glom(physeq = GlobalPatterns, taxrank = "Phylum")
-# Convertimos a abundancia relativa
+# Converting to relative data
 global_phyla_rel_abu = transform_sample_counts(physeq = global_phyla, function(x){x/sum(x)})
 
 plot_bar(global_phyla_rel_abu, fill="Phylum")
 ````
 
-
-
-Podemos filtrar grupos raros para que la gráfica sea mas simple
+We could additional filter rare groups to simplify the plot
 
 ````
-# Esta linea remueve grupos con abundancia menor al 5% 
+# This line remove groups with abundance smaller than 5% 
 global_phyla_rel_abu_clean = prune_taxa(taxa_sums(global_phyla_rel_abu) > 0.05, global_phyla_rel_abu)
 
 phyla_plot = plot_bar(global_phyla_rel_abu_clean, fill="Phylum")
@@ -299,7 +300,7 @@ phyla_plot
 phyla_plot + facet_wrap(~SampleType, nrow=1, scales="free_x")
 ````
 
-Para visualizar otros niveles de taxonomía tenemos que seleccionar subsets primero y luego graficarlos con *plot_bar()*.
+To visualize some parts of the communities we need to subset them first and then use *plot_bar*
 
 ````
 Acidos = subset_taxa(GlobalPatterns, Phylum == "Acidobacteria")
@@ -308,50 +309,58 @@ Acidos_rel_abu = transform_sample_counts(Acidos2, function(x){x/sum(x)})
 Acido_plot = plot_bar(Acidos_rel_abu, fill="Class")
 Acido_plot
 ````
-Podemos visualizar los mismos datos en un heatmap. *Phyloseq* usa ordenaciones para organizar las muestras y OTUs en vez de usar agrupamiento jerárquico como otros métodos tradicionales de heatmap.
-````
-# Sin reordenación de columnas
+
+We can also visualize the same data using heatmaps via the *plot_heatmap* command. *Phyloseq* uses ordination methods to group samples instead of hierarchical clustering, commonly used in other heatmap functions.
+
+
+```
+# A heatmap without sample reordering
 plot_heatmap(Acidos_rel_abu,  method=NULL, sample.label="SampleType", sample.order="SampleType")
 
-# Ordenando por NMDS con distancias de Bray-Curtis
-plot_heatmap(Acidos_rel_abu,  # Objeto a graficar
-             method="NMDS",   # Método para crear ordenación
-             distance ="bray", # Distancia para crear ordenación ya que NMDS la requiere
-             sample.label="SampleType",  # Las muestras utilizan los nombre que les corresponden en la tabla de metadatos
-             sample.order="SampleType"   # Las muestras están re-ordenadas según el factor "SampleType" en la tabla de metadatos
+
+# A heatmap with the samples reordered according to their sample similarity
+plot_heatmap(Acidos_rel_abu,  # Object to plot
+             method="NMDS",   # Method for the ordination
+             distance ="bray", # Distance method to use, required by NMDS
+             sample.label="SampleType",  # Labels will the the Sample type derived from the metadata 
+             sample.order="SampleType"   # Samples will be reordered by the  "SampleType" factor
              )
 ````
 
 
-## Diversidad alfa <a name="p6"></a>
-Podemos hacer análisis de diversidad alfa directamente con la función *plot_richness()* y calcular diferentes indices de diversidad alfa con *estimate_richness()*.
+## Alpha diversity <a name="p6"></a>
+
+We can calculate and visualize alpha diversity using *estimate_richness()* (getting multiple diversity indices) and *plot_richness()*.
+
 
 ````
-# Graficando directamente
-set.seed(191931)
+# Creating graphs directly
+set.seed(191931) # We specify the random seed to make the sampling replicable
 rare_global <-rarefy_even_depth(GlobalPatterns, rngseed=TRUE)
 plot_richness (rare_global,color="SampleType" )
 plot_richness (mothur_data, color="dpw") 
 
-# Para hacer pruebas estadísticas necesitamos extraer los estimados de diversidad alfa y los metadatos
+# Getting the alpha diversity indices
 alfa_div = estimate_richness(rare_global, measures = c("Observed", "Shannon", "Simpson"))
 alfa_div
 
-# Extraemos los metadatos
-factores = data.frame(sample_data(rare_global))
-summary(factores)
+# Extracting the metadata from the phyloseq object
+my_factors = data.frame(sample_data(rare_global))
+summary(my_factors)
 
-# Hacemos una prueba de Kruskall Wallis (ANOVA no paramétrico)
-# Probamos diferencia de diversidad observada (riqueza) por tratamiento
-kruskal.test(alfa_div$Observed ~ factores$SampleType)
+# Testing for difference in richness according to sample type using
+# a Kruskal Wallis test (Non-parametric ANOVA)
+kruskal.test(alfa_div$Observed ~ my_factors$SampleType)
 
-# Graficamos la riqueza por tipo de muestras
-boxplot(alfa_div$Observed ~ factores$SampleType)
+# Plotting richness by sample type
+boxplot(alfa_div$Observed ~ my_factors$SampleType)
 ````
 
-## Ordenaciones libres <a name="p7"></a>
+## Beta diversity <a name="p7"></a>
 
-Para hacer ordenaciones usamos el comando *ordinate()* y luego graficamos la ordenación con *plot_ordination()*. El primer comando usar por defecto el método DCA pero puede usar también CCA, RDA, CAP, DPCoA, NMDS, MDS, y PCoA. 
+We use unconstrained ordinations to analyze the diversity across samples i.e. their beta diversity. 
+We create ordination using *ordinate()* and then graph the ordination results with *plot_ordination()*. 
+The first commands uses DCA by default but we can also use CCA, RDA, CAP, DPCoA, NMDS, MDS, and PCoA. 
 
 
 ````
@@ -364,37 +373,30 @@ rare_global = rarefy_even_depth(GlobalPatterns, rngseed=TRUE)
 ordination2 = ordinate(rare_global, method="NMDS", distance="bray")
 nmds2 = plot_ordination(rare_global, ordination2, color="SampleType")
 nmds2
-
-# Este requiere la versión mas actual de R y Phyloseq, puede que no funcione (a mi no me funciono :( )
-ordination3 <-ordinate(rare_global, method="PCoA", distance="unifrac", weighted=TRUE)
-w_unifrac = plot_ordination(rare_global, ordination3, color="SampleType")
-w_unifrac
-
 ````
 
-## Pruebas de hipótesis <a name="p8"></a>
+## Hypothesis testing <a name="p8"></a>
 
 ### PERMANOVA <a name="p8.1"></a>
-Para el análisis de variación multivariado vamos a utilizar el paquete *vegan* por lo que tenemos que exportar la tabla de OTUs y la tabla de metadatos
+
+To test the effect of a experimental factor on the similarity of samples we will do a Permutational multivariate analysis of variation (PERMANOVA) using the *vegan* package in *R*. We need to first export the OTU table and the metadata as objects.
 
 ````
-# PERMANOVA usa permutaciones al azar,
-# así que si establecemos  el valor de la semilla inicial
-# para que el resultado sea reproducible.
+# PERMANOVA uses random permutations, so we should use a specific random seed if we want to have a fully reproducible work.
 set.seed(1)  
   
-# Exportación de la tabla de disimilitud de OTUs
+# Creating a distance matrix from the OTU table 
 dist_otus = phyloseq::distance(rare_global, method = "bray")
 
-# Exportacion de la tabla de metadatos o del dise~o experimental
-tabla_metadatos = data.frame(sample_data(rare_global))
+# Exporting metadata which includes the experimental design
+table_metadata = data.frame(sample_data(rare_global))
 
-summary(tabla_metadatos)
+summary(table_metadata)
 
-adonis(dist_otus ~ SampleType, data = tabla_metadatos)
+adonis(dist_otus ~ SampleType, data = table_metadata)
 #
 #Call:
-#adonis(formula = tabla_otus ~ SampleType, data = tabla_metadatos) 
+#adonis(formula = tabla_otus ~ SampleType, data = table_metadata) 
 #
 #Permutation: free
 #Number of permutations: 999
@@ -408,52 +410,51 @@ adonis(dist_otus ~ SampleType, data = tabla_metadatos)
 #---
 #Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 
 ````
-La interpretación es que los centroides para los diferente tipo de suelos son significativamente diferente (p<0.001). 
-El factor *SampleType* explica es 67.5% de la de los perfiles de OTUs.  
-Si hay mas de un factor hay que incluirlos en la formula de manera secuencial:
->adonis(tabla_otus ~ Factor1 + Factor2, data = tabla_metadatos)  
+The interpretation of the results is that the centroids for the different soil types are significantly different (p<0.001). The *SampleType* factor explaines 67.5% of the OTUs profile variation.  
+If there are more factor we can include them in a sequential manners:
+>adonis(tabla_otus ~ Factor1 + Factor2, data = table_metadata)  
 
-### Análisis de dispersión <a name="p8.2"></a>
+### Dispersion analysis <a name="p8.2"></a>
 
-Luego de hacer el PERMANOVA es necesario hace un análisis de dispersión para saber si la diferencia de centroides que identifico PERMANOVA es influenciada por diferencias en dispersión.
+After a PERMANOVA is commonly used to run a dispersion analysis, to see if the differences in centroids found in PERMANOVA are influenced by difference in dispersion (how separated a group of samples are). 
 
 ````
-# Calculamos la dispersión de la muestras según su tipo
-disp_SampleType = betadisper(dist_otus , tabla_metadatos$SampleType)
+#Calculate the dispersion of the samples according to the factor SampleType
+disp_SampleType = betadisper(dist_otus , table_metadata$SampleType)
 
-# Ahora hacemos un la prueba de significancia (similar a un ANOVA) usando permutaciones para evaluar si la varianza difiere entre grupos
+# Now we can test the significance with using permutations 
 permutest(disp_SampleType, pairwise=TRUE, permutations=1000)
 ````
 
-Los resultados sugieren que si hay diferencias en dispersión lo cual hace los resultados mas difíciles de interpretar. Se espera que esto ocurra con este set de datos porque este incluye muchos tipos de muestras incluyendo suelos (que son muy diversos) y muestras intestinales (que no los son).
+The results are significant (samples from different sample types have different dispersion), which makes the PERMANOVA results harder to interpret. We expect this in this particular set because it includes soils samples (highly variable and diverse) and gut samples (low diversity and variation).
 
 ### ANOSIM <a name="p8.3"></a>
 
-El análisis de similaridad (ANOSIM) es útil cuando los grupos a comparar tienen tamaños muy diferentes como alternativa a PERMANOVA.
-Este test no asume igualdad de varianza, pero es limitado en el numero de variables a evaluar y solo funciona con variables categóricas.
+The analysis of similarity (ANOSIM) is a useful alternative to PERMANOVA when the groups being compared have very different sizes. The test evaluates if the similarity within groups is smaller than the similarity between groups. ANOSIM does not assume equal variation but it is limited in the number of variables to evaluate and only works with categorical variables.
 ````
 anosim_otus = anosim(dist_otus, tabla_metadatos$SampleType, permutations = 1000)
 anosim_otus
 plot(anosim_otus)
 ````
 
-## Ordenaciones restringidas <a name="p9"></a>
+## Constrained ordinations <a name="p9"></a>
 
-Para crear ordenaciones restringidas podemos usar el comando *ordinate()*.  Vamos a trabajar con el set llamado *soilrep*. Este set de datos proviene de suelos de pastura que fueron cortados o sin cortar, con y sin calentamiento. Tiene ademas un alto nivel de replicación (24 muestras * 4 tratamientos). 
-
+We use again *ordinate()* for constrained ordinations. Constrained ordinations try to represent the majority of the multivariate variation explained by our explanatory variables instead of all the variability present.
+We will work for this examples with the *soilrep* dataset. This sets come from pasture soils that were cut/uncut and were warmed/unwarmed (four treatments in total).
+. 
 
 ````
 data(soilrep)
 
-set.seed(191931) # Establecemos el valor inicial para el submuestreo al azar
-soil2 = rarefy_even_depth(soilrep, sample.size = 1000) # Seleccionamos 1000 secuencias por muestra
+set.seed(191931) # Using a specific random seed for reproducibility
+soil2 = rarefy_even_depth(soilrep, sample.size = 1000) # Randomly selecting 1000 sequences per sample
 
-# Extraemos los componentes
-tabla_otus2 = t(otu_table(soil2))
+# Extracting components
+table_otus2 = t(otu_table(soil2))
 dist_otus2 = phyloseq::distance(soil2, method = "bray")
-tabla_metadatos2 = (data.frame(sample_data(soil2)))
+table_metadatos2 = (data.frame(sample_data(soil2)))
 
-# Creamos modelos estadisticos, uno con solo los tratamiento, el segundo considerando las replicas
+# Creating CAP models, one with treatments only, the other one also with replicates
 cap_ord1 <- ordinate(
   physeq = global2, 
   method = "CAP",
@@ -468,15 +469,15 @@ cap_ord2 <- ordinate(
   formula = ~ Treatment + warmed + Sample 
 )
 
-# Probamos el nivel de significancia de la ordenación
+# Testing significant of models
 anova(cap_ord1)
 anova(cap_ord2)
 ````
 
-Para graficar los modelos podemos usar *plot_ordination()* de nuevo.
+To plot the ordinations we use *plot_ordination()* again.
 
 ````
-# Graficamos los modelos
+# CAP plot 1
 cap_plot1 <- plot_ordination(
   physeq = soil2, 
   ordination = cap_ord1, 
@@ -487,16 +488,16 @@ cap_plot1 <- plot_ordination(
 cap_plot1
 ````
 
-Para un gráfico mas detallada podemos obtener los datos de los centroides y agregarlos manualmente.
+We can further modify the graph by getting the centroids data from the results and adding them manually .
 
 ````
-# Agregamos las variables ambientales como flechas
+# Save environmental variables data to display them latter as arrows
 arrowmat <- vegan::scores(cap_ord1, display = "bp")
 
-# Agregamos las etiquetas y creamos una tabla
+# Adding labels and converting it to a data frame
 arrowdf <- data.frame(labels = rownames(arrowmat), arrowmat)
 
-# Definimos la coordenadas para agregar las flechas
+# Creating arrow coordinates, they start at (0, 0)
 arrow_map <- aes(xend = CAP1, 
                  yend = CAP2, 
                  x = 0, 
@@ -505,7 +506,7 @@ arrow_map <- aes(xend = CAP1,
                  color = NULL, 
                  label = labels)
 
-# Definimos las etiquetas para agregar a las flechas
+# Creating labels to add to the arrows
 label_map <- aes(x = 1.3 * CAP1, 
                  y = 1.3 * CAP2, 
                  shape = NULL, 
@@ -514,7 +515,7 @@ label_map <- aes(x = 1.3 * CAP1,
 
 arrowhead = arrow(length = unit(0.02, "npc"))
 
-# Creamos una nueva gráfica
+# Creating the final graph. We start with the previous plot and add text and arrows
 cap_plot1 + 
   geom_segment(
     mapping = arrow_map, 
@@ -531,28 +532,29 @@ cap_plot1 +
   )
 ````
 
-## Datos de la sesión <a name="p10"></a>
+## Session information <a name="p10"></a>
 
-
-Finalmente se recomienda grabar los datos de la sesión, esto es útil para poder recrear los datos completamente, especialmente si es que posteriormente se usan otras versiones de R o de alguno de los paquetes. Esta información se puede guardar al final del script.
+We always recommend to save the session information (the version of R and the packages used). This is useful to fully reproduce the analysis and results since different version of R and packages can create slightly different results.  
 
 ```
 sessionInfo()
 ```
- 
-Alternativamente se puede grabar todos objetos de la sesión usando 
+We highly recommend saving this info (at the end of the script for example).  
+
+We can also save a specific R object with *save.image* or all of the session objects with *save.image*
+
 
 ````
-save.image("Toda_la_session.RData") # Graba todos los objetos de la sesión a un archivo de extensión *.Rdata*
-save(data, file="un_objeto.Rdata")  # Graba el objeto data a un archivo de extensión *.Rdata*
+save.image("All_session_data.RData") # Saves all the object in the session as a *RData* file.
+save(data, file="an_object.Rdata")  # Saves the "data" object from the session as a *RData* file
 
-load("Toda_la_session.RData") # Carga todos los objetos contenidos en el archivo de extensión *.Rdata*
-load("un_objeto.Rdata") # Carga todos los objetos contenidos en el archivo de extensión *.Rdata*
-
-````
+load("All_session_data.RData") # Loads all the object in the file with extension *.Rdata*
+load("an_object.Rdata") # Same as above, but only one object is loaded since we saved only one
 
 ````
-#Enterotipos
+
+````
+# Using the Enterotypes dataset
 
 data(enterotype)
 set.seed(20180319)
@@ -561,10 +563,9 @@ enterotype2 = prune_samples(!is.na(sample_data(enterotype)$Enterotype), enteroty
 enterotype2
 
 dist1 = phyloseq::distance(enterotype2, method = "bray")
-metadatos = sample_data(enterotype2)
-summary(metadatos)
+metadata_ent = sample_data(enterotype2)
+summary(metadata_ent)
 
-#capscale(dist1 ~ Enterotype, data=metadatos, sqrt=T)
 
 cap_ord2 <- ordinate(
   physeq = enterotype2, 
@@ -575,6 +576,3 @@ cap_ord2 <- ordinate(
 
 anova(cap_ord2)
 ````
-
-
-
