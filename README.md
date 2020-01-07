@@ -1,3 +1,6 @@
+![Logos](https://carden24.github.com/images/LOGOS.jpg)
+
+
 # Repository for
 ## BCREGMED Microbiome sequencing workshop 2020
 
