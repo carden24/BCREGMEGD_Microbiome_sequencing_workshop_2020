@@ -28,6 +28,7 @@ The standard operational protocol (SOP) for *Mothur* using Miseq data can be fou
 
 
 **4. Other files (in the folder *Resources*)**:  
+
 Publication, books, and other tools organized by themes. Including
 - *Tree diversity analysis*, by Roeland Kindt and Richard Coe.  
   A short book on diversity analysis. Contains detailed explanation and code to make diversity analysis in R.
