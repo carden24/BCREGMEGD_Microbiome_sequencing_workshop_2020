@@ -8,10 +8,10 @@
 -----------
 This repository contains:
 
-1. Slides
+**1. Slides**
 - Introduction to diversity analysis using 16S rRNA gene sequencing
 
-2. Tutorial  for analysis of Miseq data using *Mothur*:
+**2. Tutorial  for analysis of Miseq data using *Mothur*:**
 - We will use a modified version of a tutorial created by *Mothur* developers [(accessible here).](<https://github.com/carden24/BCREGMEGD_Microbiome_sequencing_workshop_2020/blob/master/Tutorial_mothur_Miseq_SOP.md>)
 The main difference is that we will not do a phylotype analysis and use fewer samples to make the tutorial faster.  
 The standard operational protocol (SOP) for *Mothur* using Miseq data can be found [here.](<http://www.mothur.org/wiki/MiSeq_SOP>)
@@ -21,11 +21,13 @@ The standard operational protocol (SOP) for *Mothur* using Miseq data can be fou
 - The version .9 of the training set created by the RDP for *Mothur* can also be found [here.](<http://www.mothur.org/w/images/5/59/Trainset9_032012.pds.zip>)
 - For 454 type data, *Mothur* also has a  recommended protocol [here.](<http://www.mothur.org/wiki/454_SOP>)
 
-3. Tutorial for manipulation of *Mothur* files using *Phyloseq*
+
+**3. Tutorial for manipulation of *Mothur* files using *Phyloseq***
 - We will use R and the *Phyloseq* package. The tutorial can be found [here](<https://github.com/carden24/BCREGMEGD_Microbiome_sequencing_workshop_2020/blob/master/Tutorial_phyloseq.md>). The microbiome data comes from the previous tutorial.
 - The tutorial is based partially on a *Phyloseq*  tutorial created by Michelle Berry found [here](http://deneflab.github.io/MicrobeMiseq/demos/mothur_2_phyloseq.html).
 
-4. Other files (in the folder *Resources*):  
+
+**4. Other files (in the folder *Resources*)**:  
 Publication, books, and other tools organized by themes. Including
 - *Tree diversity analysis*, by Roeland Kindt and Richard Coe.  
   A short book on diversity analysis. Contains detailed explanation and code to make diversity analysis in R.
