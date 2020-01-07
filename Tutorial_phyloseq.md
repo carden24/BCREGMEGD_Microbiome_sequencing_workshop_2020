@@ -82,7 +82,7 @@ data
 # otu_table()   OTU Table:         [ 361 taxa and 8 samples ]
 # sample_data() Sample Data:       [ 8 samples by 1 sample variables ]
 # tax_table()   Taxonomy Table:    [ 361 taxa by 6 taxonomic ranks ]
-```
+````
 
 Alternatively, we can add each element individually if we do not have the biom file. Please note that the biom file did not have the phylogenetic tree, so you need to add it manually if interested.
 
@@ -116,11 +116,11 @@ mothur_data
 # otu_table()   OTU Table:         [ 361 taxa and 8 samples ]
 # sample_data() Sample Data:       [ 8 samples by 1 sample variables ]
 # tax_table()   Taxonomy Table:    [ 361 taxa by 6 taxonomic ranks ]
-```
+````
 
 Once we have this object, we can use several functions to access the different components of the object.
 
-```
+````
 # Basic functions, just put the name of the object inside the parenthesis
  
 otu_table(mothur_data)		# Reports the OTU table
@@ -174,7 +174,7 @@ soilrep
 
 We first check the read distribution for the samples to look for outliers. We will create a table with a column called "sum" and visualize this data.
 
-```
+````
 sample_sum_df <- data.frame(sum = sample_sums(soilrep)) 
 
 # Exploring mean, maximum, and minimum
@@ -188,7 +188,7 @@ ggplot(sample_sum_df, aes(x = sum)) +
   geom_histogram(color="Black", binwidth = 500) +
   ggtitle("Distribution of sample sequencing depth") + 
   xlab("Read counts")  + ylab("Frequency")
-```
+````
 
 ![Read distribution graph](https://carden24.github.com/images/distribucion_lecturas.png) 
 
@@ -328,15 +328,15 @@ Acido_plot
 We can also visualize the same data using heatmaps via the *plot_heatmap* command. *Phyloseq* uses ordination methods to group samples instead of hierarchical clustering, commonly used in other heatmap functions.
 
 
-```
+````
 # A heatmap without sample reordering
 plot_heatmap(Acidos_rel_abu,  method=NULL, sample.label="SampleType", sample.order="SampleType")
-```
+````
 
 ![heatmap_plot1](https://carden24.github.com/images/heatmap1.png)
 
 
-```
+````
 # A heatmap with the samples reordered according to their sample similarity
 plot_heatmap(Acidos_rel_abu,  # Object to plot
              method="NMDS",   # Method for the ordination
@@ -359,12 +359,12 @@ We can calculate and visualize alpha diversity using *estimate_richness()* (whic
 set.seed(191931) # We specify the random seed to make the sampling reproducible
 rare_global <-rarefy_even_depth(GlobalPatterns, rngseed=TRUE)
 plot_richness (rare_global,color="SampleType" )
-```
+````
 
 ![richness_plot](https://carden24.github.com/images/richness1.png)
 
 
-```
+````
 # Getting the alpha diversity indices
 alfa_div = estimate_richness(rare_global, measures = c("Observed", "Shannon", "Simpson"))
 alfa_div
@@ -409,7 +409,8 @@ set.seed(191931)
 ordination1 <-ordinate(rare_soil, method="NMDS", distance="bray")
 nmds1 <-plot_ordination(rare_soil, ordination1, color="Treatment")
 nmds1 
-```
+````
+
 ![nmds1](https://carden24.github.com/images/nmds1.png)
 
 
@@ -458,6 +459,7 @@ adonis(dist_otus ~ SampleType, data = table_metadata)
 # ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 ````
+
 The interpretation of the results is that the centroids for the different soil types are significantly different (p < 0.001). The *SampleType* factor explains 72.7% of the OTUs profile variation.  
 If there are more factor we can include them in a sequential manners e.g. adonis(tabla_otus ~ Factor1 + Factor2, data = table_metadata)  
 
@@ -493,9 +495,9 @@ The results are significant (samples from different sample types have different 
 
 We always recommend to save the session information (the version of *R* and the packages used in the analysis). This information is useful to fully reproduce the analysis and results since different version of R and packages can create slightly different results.  
 
-```
+````
 sessionInfo()
-```
+````
 
 We highly recommend saving this info (at the end of the script for example).  
 

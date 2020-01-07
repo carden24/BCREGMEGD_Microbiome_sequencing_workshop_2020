@@ -19,8 +19,8 @@
    1. [Noise removal](#p5.1)
    2. [Chimera removal](#p5.2)
    3. [Unwanted lineages removal](#p5.3)
-6. [OTU table creation(#p6)
-7. [Phylogenetic trees creation](#p7)
+6. [OTU table creation](#p6)
+7. [Phylogenetic tree creation](#p7)
 8. [Data export](#p8)
 
 ## Introduction  <a name="p1"></a>
@@ -372,7 +372,7 @@ The last step in the protocol is to classify each OTU. We will use the *classify
 classify.otu(list=current, count=current, taxonomy=current, label=0.03)
 ```
 
-## Phylogenetic trees creation (optional) <a name="p7"></a>
+## Phylogenetic tree creation (optional) <a name="p7"></a>
 
 Some methods, such as UNIFRAC, require to know the place of each OTU in the project in a phylogenetic tree. To create this tree, we use a distance-based tree method using our alignment and its corresponding distance matrix (Neighbour-joining method).
 
