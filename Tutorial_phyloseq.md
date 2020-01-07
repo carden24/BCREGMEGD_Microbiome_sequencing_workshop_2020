@@ -127,8 +127,8 @@ otu_table(mothur_data)		# Reports the OTU table
 sample_data(mothur_data)	# Reports the sample information such as experimental design or metadata
 tax_table(mothur_data)		# Reports the taxonomic classification of each OTUs
 
-ntaxa(mothur_data) 			# Number of OTUs
-nsamples(mothur_data) 		# Number of samples
+ntaxa(mothur_data)			# Number of OTUs
+nsamples(mothur_data)		# Number of samples
 
 sample_names(mothur_data)	# Sample names
 taxa_names(mothur_data)		# Taxa names
