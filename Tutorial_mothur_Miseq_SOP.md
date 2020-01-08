@@ -46,7 +46,7 @@ To run this tutorial we need to download the file and uncompress it inside the w
 If you are using Linux save the *Mothur.linux.zip* file in the *~/BCREGMED2020/* folder, open a terminal and use the following commands 
 
 ```
-cd ~/BCREGMED2020/
+cd ~/Desktop/BCREGMED2020/
 unzip Mothur.linux.zip
 cd mothur
 ```
