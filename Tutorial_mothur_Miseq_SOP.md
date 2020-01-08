@@ -43,7 +43,7 @@ The first step is to decide the location where to store all the files for the tu
 The most recent version of *Mothur* can be found [here.](https://github.com/mothur/mothur/releases/latest)  
 To run this tutorial we need to download the file and uncompress it inside the working directory. This version of *Mothur* does not have a graphic interface. Instead we need to type commands at the *mothur* terminal.
 
-If you are using Linux save the *Mothur.linux.zip* file in the *~/BCREGMED2020/* folder, open a terminal and use the following commands 
+If you are using Linux save the *Mothur.linux.zip* file in the *~/BCREGMED2020/* folder, open a terminal with **CTRL** + **ALT** + **T** and use the following commands 
 
 ```
 cd ~/Desktop/BCREGMED2020/
