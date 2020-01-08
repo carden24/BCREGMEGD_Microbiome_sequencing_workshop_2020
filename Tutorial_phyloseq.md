@@ -44,7 +44,8 @@ Open *RStudio*, and create a new *R* script with **Ctrl** + **Shift** + **N**. T
 
 
 ````
-setwd("E:/Libraries/Dropbox/tutorial/") # This is my working directory, change it to something more useful for you
+#setwd("E:/Libraries/Dropbox/tutorial/") # This is my working directory, change it to something more useful for you
+setwd("~/BCREGMED2020/pseq/")
 getwd() # This command reports the current working directory
 
 ````
